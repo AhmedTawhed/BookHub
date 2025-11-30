@@ -1,7 +1,7 @@
 ﻿using BookHub.Core.DTOs.BookDtos;
 using BookHub.Core.DTOs.CategoryDtos;
 using BookHub.Core.Entities;
-using BookHub.Infrastructure.Repositories;
+using BookHub.Core.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

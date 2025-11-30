@@ -1,6 +1,6 @@
 ﻿using BookHub.Core.DTOs.ReviewDto;
 using BookHub.Core.Entities;
-using BookHub.Infrastructure.Repositories;
+using BookHub.Core.Interfaces;
 
 namespace BookHub.Infrastructure.Services
 {
@@ -30,7 +30,8 @@ namespace BookHub.Infrastructure.Services
         {
             var reviews = await _unitOfWork.Reviews.GetReviewsByBookId(bookId);
             if (reviews == null)
-                return null;
+                return Enumerable.Empty<ReviewDto>();
+
             return reviews.Select(r => new ReviewDto
             {
                 Id = r.Id,
@@ -42,11 +43,11 @@ namespace BookHub.Infrastructure.Services
             });
         }
 
-        public async Task AddReview(string userId, int bookId, ReviewResponseDto dto)
+        public async Task<ReviewDto> AddReview(string userId, int bookId, ReviewResponseDto dto)
         {
-            var exists = _unitOfWork.Reviews.IsReviewd(userId, bookId);
+            var reviewed = await _unitOfWork.Reviews.IsReviewed(userId, bookId);
 
-            if (exists)
+            if (reviewed)
                 throw new Exception("Book already reviewed.");
 
             var review = new Review
@@ -60,9 +61,19 @@ namespace BookHub.Infrastructure.Services
 
             await _unitOfWork.Reviews.Add(review);
             await _unitOfWork.CompleteAsync();
+
+            return new ReviewDto
+            {
+                Id = review.Id,
+                BookId = review.BookId,
+                UserId = review.UserId,
+                Rating = review.Rating,
+                Comment = review.Comment,
+                CreatedAt = review.CreatedAtUtc
+            };
         }
 
-        public async Task UpdateReview(string userId, int reviewId, ReviewResponseDto dto)
+        public async Task<ReviewDto> UpdateReview(string userId, int reviewId, ReviewResponseDto dto)
         {
             var review = await _unitOfWork.Reviews.GetById(reviewId);
 
@@ -77,6 +88,16 @@ namespace BookHub.Infrastructure.Services
 
             _unitOfWork.Reviews.Update(review);
             await _unitOfWork.CompleteAsync();
+
+            return new ReviewDto
+            {
+                Id = review.Id,
+                BookId = review.BookId,
+                UserId = review.UserId,
+                Rating = review.Rating,
+                Comment = review.Comment,
+                CreatedAt = review.CreatedAtUtc
+            };
         }
     }
 }

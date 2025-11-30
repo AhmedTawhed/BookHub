@@ -1,6 +1,10 @@
 ﻿using BookHub.Core.DTOs.BookDtos;
 using BookHub.Core.Entities;
-using BookHub.Infrastructure.Repositories;
+using BookHub.Core.Helpers.CustomRequests;
+using BookHub.Core.Helpers.CustomResults;
+using BookHub.Core.Interfaces;
+using BookHub.Core.Interfaces.IService;
+using Microsoft.AspNetCore.Http.HttpResults;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +22,7 @@ namespace BookHub.Infrastructure.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<BookDto?> GetBookById(int id)
+        public async Task<BookResponseDto?> GetBookById(int id)
         {
             var book = await _unitOfWork.Books.GetById(id);
             if (book == null)
@@ -26,7 +30,7 @@ namespace BookHub.Infrastructure.Services
                 return null;
             }
 
-            return new BookDto
+            return new BookResponseDto
             {
                 Id = book.Id,
                 Title = book.Title,
@@ -36,11 +40,11 @@ namespace BookHub.Infrastructure.Services
             };
         }
 
-        public async Task<IEnumerable<BookDto>> GetAllBooks()
+        public async Task<IEnumerable<BookResponseDto>> GetAllBooks()
         {
             var books = await _unitOfWork.Books.GetAll();
 
-            return books.Select(book => new BookDto
+            return books.Select(book => new BookResponseDto
             {
                 Id = book.Id,
                 Title = book.Title,
@@ -49,7 +53,7 @@ namespace BookHub.Infrastructure.Services
                 CategoryId = book.CategoryId
             });
         }
-        public async Task<BookDto> AddBook(BookResponseDto dto)
+        public async Task<BookResponseDto> AddBook(BookRequestDto dto)
         {
             var book = new Book
             {
@@ -62,7 +66,7 @@ namespace BookHub.Infrastructure.Services
             await _unitOfWork.Books.Add(book);
             await _unitOfWork.CompleteAsync();
 
-            return new BookDto
+            return new BookResponseDto
             {
                 Id = book.Id,
                 Title = book.Title,
@@ -71,14 +75,12 @@ namespace BookHub.Infrastructure.Services
                 CategoryId = book.CategoryId
             };
         }
-        public async Task<bool> UpdateBook(int id, BookResponseDto dto)
+        public async Task<BookResponseDto> UpdateBook(int id, BookRequestDto dto)
         {
             var book = await _unitOfWork.Books.GetById(id);
 
             if (book == null)
-            {
-                return false;
-            }
+                throw new Exception("Book not found.");
 
             book.Title = dto.Title;
             book.Author = dto.Author;
@@ -88,7 +90,14 @@ namespace BookHub.Infrastructure.Services
             _unitOfWork.Books.Update(book);
             await _unitOfWork.CompleteAsync();
 
-            return true;
+            return new BookResponseDto
+            {
+                Id = book.Id,
+                Title = book.Title,
+                Author = book.Author,
+                Description = book.Description,
+                CategoryId = book.CategoryId
+            };
         }
 
         public async Task<bool> DeleteBook(int id)
@@ -103,6 +112,20 @@ namespace BookHub.Infrastructure.Services
             await _unitOfWork.CompleteAsync();
 
             return true;
+        }
+
+        public async Task<IEnumerable<BookResponseDto>> GetPaged(GridRequest request)
+        {
+            var books = await _unitOfWork.Books.GetPage(request);
+
+            return books.Select(book => new BookResponseDto
+            {
+                Id = book.Id,
+                Title = book.Title,
+                Author = book.Author,
+                Description = book.Description,
+                CategoryId = book.CategoryId
+            });
         }
     }
 }

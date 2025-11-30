@@ -1,4 +1,4 @@
-﻿namespace BookHub.Infrastructure.Repositories
+﻿namespace BookHub.Core.Interfaces
 {
     public interface IUnitOfWork : IDisposable
     {

@@ -1,6 +1,6 @@
 ﻿using BookHub.Core.DTOs.BookDtos;
-using BookHub.Infrastructure.Services;
-using Microsoft.AspNetCore.Http;
+using BookHub.Core.Helpers.CustomRequests;
+using BookHub.Core.Interfaces.IService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookHub.Controllers
@@ -35,7 +35,7 @@ namespace BookHub.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Addbook([FromBody] BookResponseDto dto)
+        public async Task<IActionResult> Addbook([FromBody] BookRequestDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -46,14 +46,14 @@ namespace BookHub.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBook(int id, [FromBody] BookResponseDto dto)
+        public async Task<IActionResult> UpdateBook(int id, [FromBody] BookRequestDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             
-            var updated = await _bookService.UpdateBook(id, dto);
+            var updatedBook = await _bookService.UpdateBook(id, dto);
 
-            if (!updated)
+            if (updatedBook == null)
                 return NotFound();
 
             return NoContent();
@@ -68,6 +68,17 @@ namespace BookHub.Controllers
                 return NotFound();
 
             return NoContent();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetPagedBooks([FromBody] GridRequest request)
+        {
+            var book = await _bookService.GetPaged(request);
+
+            if (book == null)
+                return NotFound();
+
+            return Ok(book);
         }
     }
 }
