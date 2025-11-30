@@ -1,4 +1,6 @@
 using BookHub.Core.Entities;
+using BookHub.Core.Interfaces;
+using BookHub.Core.Interfaces.IService;
 using BookHub.Infrastructure.Data;
 using BookHub.Infrastructure.Repositories;
 using BookHub.Infrastructure.Seeding;

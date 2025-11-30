@@ -1,4 +1,5 @@
 ﻿using BookHub.Core.Entities;
+using BookHub.Core.Interfaces;
 using BookHub.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -29,9 +30,9 @@ namespace BookHub.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public bool IsReviewd(string userId, int bookId)
+        public async Task<bool> IsReviewed(string userId, int bookId)
         {
-            return  _context.Reviews.Any(r => r.UserId == userId && r.BookId == bookId);
+            return  await _context.Reviews.AnyAsync(r => r.UserId == userId && r.BookId == bookId);
         }
 
         public async Task<Review?> GetUserReviewForBook(string userId, int bookId)

@@ -1,11 +1,6 @@
 ﻿using BookHub.Core.DTOs.FavoriteBookDto;
 using BookHub.Core.Entities;
-using BookHub.Infrastructure.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BookHub.Core.Interfaces;
 
 namespace BookHub.Infrastructure.Services
 {
@@ -29,34 +24,45 @@ namespace BookHub.Infrastructure.Services
             });
         }
 
-        public async Task AddFavoriteBook(string userId, FavoriteBookResponseDto dto)
+        public async Task<FavoriteBookDto> AddFavoriteBook(string userId, int bookId)
         {
-            var exists = await _unitOfWork.FavoriteBooks.GetFavoriteBook(userId, dto.BookId);
+            var exists = await _unitOfWork.FavoriteBooks.GetFavoriteBook(userId, bookId);
 
             if (exists != null)
                 throw new Exception("Book already in favorites.");
 
+            var book = await _unitOfWork.Books.GetById(bookId);
+            if (book == null)
+                throw new Exception("Book does not exist.");
+
             var favorite = new FavoriteBook
             {
                 UserId = userId,
-                BookId = dto.BookId
+                BookId = bookId
             };
 
             await _unitOfWork.FavoriteBooks.Add(favorite);
             await _unitOfWork.CompleteAsync();
+
+            return new FavoriteBookDto
+            {
+                BookId = favorite.BookId,
+                BookTitle = favorite.Book.Title,
+                UserId = favorite.UserId
+            };
         }
 
-        public async Task RemoveFavoriteBook(string userId, int bookId)
+        public async Task<bool> RemoveFavoriteBook(string userId, int bookId)
         {
             var favorite = await _unitOfWork.FavoriteBooks.GetFavoriteBook(userId, bookId);
 
             if (favorite == null)
-                throw new Exception("Favorite book not found.");
+                return false;
 
             _unitOfWork.FavoriteBooks.Delete(favorite);
             await _unitOfWork.CompleteAsync();
+
+            return true;
         }
-
-
     }
 }

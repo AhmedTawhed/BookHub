@@ -1,4 +1,5 @@
 ﻿using BookHub.Core.Entities;
+using BookHub.Core.Interfaces;
 using BookHub.Infrastructure.Data;
 using System;
 using System.Collections.Generic;

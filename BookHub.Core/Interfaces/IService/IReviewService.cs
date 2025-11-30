@@ -6,7 +6,7 @@ namespace BookHub.Infrastructure.Services
     {
         Task<IEnumerable<ReviewDto>> GetReviewsByUser(string userId);
         Task<IEnumerable<ReviewDto>> GetReviewsByBook(int bookId);
-        Task AddReview(string userId, int bookId, ReviewResponseDto dto);
-        Task UpdateReview(string userId, int reviewId, ReviewResponseDto dto);
+        Task<ReviewDto> AddReview(string userId, int bookId, ReviewResponseDto dto);
+        Task<ReviewDto> UpdateReview(string userId, int reviewId, ReviewResponseDto dto);
     }
 }
