@@ -1,6 +1,4 @@
-﻿using BookHub.Core.DTOs.FavoriteBookDto;
-using BookHub.Core.DTOs.ReviewDto;
-using BookHub.Infrastructure.Services;
+﻿using BookHub.Core.Interfaces.Service;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 

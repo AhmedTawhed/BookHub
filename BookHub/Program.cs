@@ -1,9 +1,8 @@
 using BookHub.Core.Entities;
 using BookHub.Core.Interfaces;
-using BookHub.Core.Interfaces.IService;
+using BookHub.Core.Interfaces.Service;
 using BookHub.Infrastructure.Data;
 using BookHub.Infrastructure.Repositories;
-using BookHub.Infrastructure.Seeding;
 using BookHub.Infrastructure.Services;
 using BookHub.Infrastructure.Services.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -70,16 +69,6 @@ builder.Services.AddSwaggerGen();
 //  Build App
 // -----------------------------
 var app = builder.Build();
-
-
-// -----------------------------
-//  Seed Roles + Admin
-// -----------------------------
-using (var scope = app.Services.CreateScope())
-{
-    await SeedData.SeedRolesAndAdmin(scope.ServiceProvider);
-}
-
 
 // -----------------------------
 //  Middleware

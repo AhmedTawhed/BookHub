@@ -1,12 +1,7 @@
 ﻿using BookHub.Core.Entities;
-using BookHub.Core.Interfaces;
+using BookHub.Core.Interfaces.Repository;
 using BookHub.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BookHub.Infrastructure.Repositories
 {

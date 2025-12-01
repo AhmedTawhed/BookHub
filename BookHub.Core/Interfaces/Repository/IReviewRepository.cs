@@ -1,6 +1,6 @@
 ﻿using BookHub.Core.Entities;
 
-namespace BookHub.Core.Interfaces
+namespace BookHub.Core.Interfaces.Repository
 {
     public interface IReviewRepository : IRepository<Review>
     {

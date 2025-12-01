@@ -1,5 +1,5 @@
-﻿using BookHub.Core.DTOs.ReviewDto;
-using BookHub.Infrastructure.Services;
+﻿using BookHub.Core.DTOs.ReviewDtos;
+using BookHub.Core.Interfaces.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -37,32 +37,32 @@ namespace BookHub.Controllers
             return Ok(reviews);
         }
 
-        [HttpPost("book/{bookId}")]
-        public async Task<IActionResult> AddReview(int bookId, [FromBody] ReviewResponseDto dto)
+        [HttpPost]
+        public async Task<IActionResult> AddReview([FromBody] ReviewRequestDto dto)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (userId == null)
-                return Unauthorized();
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdReview = await _reviewService.AddReview(userId, bookId, dto);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            return CreatedAtAction(nameof(GetReviewsByBook), new { bookId }, createdReview);
+            if (dto.UserId == null)
+                return Unauthorized();
+
+            var createdReview = await _reviewService.AddReview(dto);
+
+            return CreatedAtAction(nameof(GetReviewsByBook), new { bookId = dto.BookId }, createdReview);
         }
 
         [HttpPut("{reviewId}")]
-        public async Task<IActionResult> UpdateReview(int reviewId, [FromBody] ReviewResponseDto dto)
+        public async Task<IActionResult> UpdateReview(int reviewId, [FromBody] ReviewRequestDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (userId == null)
                 return Unauthorized();
-
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
             var updatedReview = await _reviewService.UpdateReview(userId, reviewId, dto);
 

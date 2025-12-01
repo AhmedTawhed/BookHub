@@ -1,12 +1,9 @@
-﻿using BookHub.Core.DTOs.BookDtos;
-using BookHub.Core.DTOs.CategoryDtos;
+﻿using BookHub.Core.DTOs.CategoryDtos;
 using BookHub.Core.Entities;
+using BookHub.Core.Helpers.CustomRequests;
+using BookHub.Core.Helpers.CustomResults;
 using BookHub.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BookHub.Core.Interfaces.Service;
 
 namespace BookHub.Infrastructure.Services
 {
@@ -19,32 +16,32 @@ namespace BookHub.Infrastructure.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<CategoryDto>> GetAllCategories()
+        public async Task<IEnumerable<CategoryResponseDto>> GetAllCategories()
         {
             var categories = await _unitOfWork.Categories.GetAll();
 
-            return categories.Select(c => new CategoryDto
+            return categories.Select(c => new CategoryResponseDto
             {
                 Id = c.Id,
                 Name = c.Name
             });
         }
 
-        public async Task<CategoryDto?> GetCategoryById(int id)
+        public async Task<CategoryResponseDto?> GetCategoryById(int id)
         {
             var category = await _unitOfWork.Categories.GetById(id);
 
             if (category == null)
                 return null;
 
-            return new CategoryDto
+            return new CategoryResponseDto
             {
                 Id = category.Id,
                 Name = category.Name
             };
         }
 
-        public async Task<CategoryDto> AddCategory(CategoryResponseDto dto)
+        public async Task<CategoryResponseDto> AddCategory(CategoryRequestDto dto)
         {
             var category = new Category
             {
@@ -53,14 +50,14 @@ namespace BookHub.Infrastructure.Services
 
             await _unitOfWork.Categories.Add(category);
             await _unitOfWork.CompleteAsync();
-            return new CategoryDto
+            return new CategoryResponseDto
             {
                 Id = category.Id,
                 Name = category.Name
             };
         }
 
-        public async Task<bool> UpdateCategory(int id, CategoryResponseDto dto)
+        public async Task<bool> UpdateCategory(int id, CategoryRequestDto dto)
         {
             var category = await _unitOfWork.Categories.GetById(id);
 
@@ -86,6 +83,23 @@ namespace BookHub.Infrastructure.Services
             await _unitOfWork.CompleteAsync();
 
             return true;
+        }
+
+        public async Task<PagedList<CategoryResponseDto>> GetPagedCategories(GridRequest request)
+        {
+            var pagedCategories = await _unitOfWork.Categories.GetPage(request);
+
+            var categoryDtos = pagedCategories.Items.Select(c => new CategoryResponseDto
+            { 
+                Id = c.Id,
+                Name = c.Name
+            });
+            return new PagedList<CategoryResponseDto>
+            {
+                Items = categoryDtos,
+                NumberOfPages = pagedCategories.NumberOfPages,
+                TotalCount = pagedCategories.TotalCount
+            };
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using BookHub.Core.DTOs.FavoriteBookDto;
+﻿using BookHub.Core.DTOs.FavoriteBookDtos;
 
-namespace BookHub.Infrastructure.Services
+namespace BookHub.Core.Interfaces.Service
 {
     public interface IFavoriteBookService
     {
