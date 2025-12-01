@@ -1,6 +1,6 @@
 ﻿using BookHub.Core.DTOs.BookDtos;
 using BookHub.Core.Helpers.CustomRequests;
-using BookHub.Core.Interfaces.IService;
+using BookHub.Core.Interfaces.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookHub.Controllers
@@ -70,15 +70,12 @@ namespace BookHub.Controllers
             return NoContent();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> GetPagedBooks([FromBody] GridRequest request)
+        [HttpGet]
+        public async Task<IActionResult> GetPagedBooks([FromQuery] GridRequest request)
         {
-            var book = await _bookService.GetPaged(request);
+            var result = await _bookService.GetPagedBooks(request);
 
-            if (book == null)
-                return NotFound();
-
-            return Ok(book);
+            return Ok(result);
         }
     }
 }

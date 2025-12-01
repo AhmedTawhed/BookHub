@@ -3,13 +3,8 @@ using BookHub.Core.Entities;
 using BookHub.Core.Helpers.CustomRequests;
 using BookHub.Core.Helpers.CustomResults;
 using BookHub.Core.Interfaces;
-using BookHub.Core.Interfaces.IService;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BookHub.Core.Interfaces.Service;
+using System.Linq.Dynamic.Core;
 
 namespace BookHub.Infrastructure.Services
 {
@@ -114,18 +109,25 @@ namespace BookHub.Infrastructure.Services
             return true;
         }
 
-        public async Task<IEnumerable<BookResponseDto>> GetPaged(GridRequest request)
+        public async Task<PagedList<BookResponseDto>> GetPagedBooks(GridRequest request)
         {
-            var books = await _unitOfWork.Books.GetPage(request);
+            var pagedBooks = await _unitOfWork.Books.GetPage(request);
 
-            return books.Select(book => new BookResponseDto
+            var bookDtos = pagedBooks.Items.Select(b => new BookResponseDto
             {
-                Id = book.Id,
-                Title = book.Title,
-                Author = book.Author,
-                Description = book.Description,
-                CategoryId = book.CategoryId
+                Id = b.Id,
+                Title = b.Title,
+                Author = b.Author,
+                Description = b.Description,
+                CategoryId = b.CategoryId
             });
+
+            return new PagedList<BookResponseDto>
+            {
+                Items = bookDtos,
+                TotalCount = pagedBooks.TotalCount,
+                NumberOfPages = pagedBooks.NumberOfPages
+            };
         }
     }
 }

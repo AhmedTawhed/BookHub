@@ -1,6 +1,6 @@
 ﻿namespace BookHub.Core.Helpers.CustomResults;
 
-public class CustomPagedResult<T>
+public class PagedList<T>
 {
     public IEnumerable<T> Items { get; set; } = Enumerable.Empty<T>();
     public int NumberOfPages { get; set; }

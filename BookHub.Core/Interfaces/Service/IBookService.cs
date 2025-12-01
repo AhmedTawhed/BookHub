@@ -1,7 +1,8 @@
 ﻿using BookHub.Core.DTOs.BookDtos;
 using BookHub.Core.Helpers.CustomRequests;
+using BookHub.Core.Helpers.CustomResults;
 
-namespace BookHub.Core.Interfaces.IService
+namespace BookHub.Core.Interfaces.Service
 {
     public interface IBookService
     {
@@ -10,6 +11,6 @@ namespace BookHub.Core.Interfaces.IService
         Task<IEnumerable<BookResponseDto>> GetAllBooks();
         Task<BookResponseDto?> GetBookById(int id);
         Task<BookResponseDto> UpdateBook(int id, BookRequestDto dto);
-        Task<IEnumerable<BookResponseDto>> GetPaged(GridRequest request);
+        Task<PagedList<BookResponseDto>> GetPagedBooks(GridRequest request);
     }
 }

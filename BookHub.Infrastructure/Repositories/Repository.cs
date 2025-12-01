@@ -1,6 +1,6 @@
 ﻿using BookHub.Core.Helpers.CustomRequests;
 using BookHub.Core.Helpers.CustomResults;
-using BookHub.Core.Interfaces;
+using BookHub.Core.Interfaces.Repository;
 using BookHub.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
@@ -25,7 +25,7 @@ namespace BookHub.Infrastructure.Repositories
         public void Update(T entity) => _dbSet.Update(entity);
         public void Delete(T entity) => _dbSet.Remove(entity);
         ///////
-        public async Task<IEnumerable<T>> GetPage(GridRequest request, Expression<Func<T, bool>>? filter = null)
+        public async Task<PagedList<T>> GetPage(GridRequest request, Expression<Func<T, bool>>? filter = null)
         {
             var query = _dbSet.AsQueryable();
 
@@ -33,6 +33,7 @@ namespace BookHub.Infrastructure.Repositories
             {
                 query = query.Where(filter);
             }
+
             if (!string.IsNullOrWhiteSpace(request.SearchText))
             {
                 var text = request.SearchText.Trim().ToLower();
@@ -42,13 +43,16 @@ namespace BookHub.Infrastructure.Repositories
 
                 if (stringProperties.Any())
                 {
-                    var searchQuery = string.Join(" || ",
+                    var searchQuery = string.Join(" OR ",
                         stringProperties.Select(p => $"({p.Name} != null && {p.Name}.ToLower().Contains(@0))"));
                     query = query.Where(searchQuery, text);
                 }
             }
             // Sorting
-            if (!string.IsNullOrEmpty(request.SortColumn))
+            var validColumns = typeof(T).GetProperties().Select(p => p.Name).ToList();
+
+            if (!string.IsNullOrEmpty(request.SortColumn) &&
+                validColumns.Contains(request.SortColumn))
             {
                 var direction = request.SortDirection?.ToLower() == "desc" ? "desc" : "asc";
                 query = query.OrderBy($"{request.SortColumn} {direction}");
@@ -62,7 +66,12 @@ namespace BookHub.Infrastructure.Repositories
                 .Take(request.Take)
                 .ToListAsync();
 
-            return items;
+            return new PagedList<T>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                NumberOfPages = (int)Math.Ceiling((double)totalCount / request.Take)
+            };
         }
     }
 }

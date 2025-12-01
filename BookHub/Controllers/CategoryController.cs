@@ -1,5 +1,6 @@
 ﻿using BookHub.Core.DTOs.CategoryDtos;
-using BookHub.Infrastructure.Services;
+using BookHub.Core.Helpers.CustomRequests;
+using BookHub.Core.Interfaces.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,7 +36,7 @@ namespace BookHub.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddCategory([FromBody] CategoryResponseDto dto)
+        public async Task<IActionResult> AddCategory([FromBody] CategoryRequestDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -46,7 +47,7 @@ namespace BookHub.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryResponseDto dto)
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryRequestDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -68,6 +69,13 @@ namespace BookHub.Controllers
                 return NotFound();
 
             return NoContent();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPagedCategories([FromQuery] GridRequest request)
+        {
+            var result = await _categoryService.GetPagedCategories(request);
+            return Ok(result);
         }
     }
 }

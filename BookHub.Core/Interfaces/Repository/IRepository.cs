@@ -1,7 +1,8 @@
 ﻿using BookHub.Core.Helpers.CustomRequests;
+using BookHub.Core.Helpers.CustomResults;
 using System.Linq.Expressions;
 
-namespace BookHub.Core.Interfaces
+namespace BookHub.Core.Interfaces.Repository
 {
     public interface IRepository<T> where T : class
     {
@@ -10,6 +11,6 @@ namespace BookHub.Core.Interfaces
         Task<IEnumerable<T>> GetAll();
         Task<T?> GetById(int id);
         void Update(T entity);
-        Task<IEnumerable<T>> GetPage(GridRequest request, Expression<Func<T, bool>>? filter = null);
+        Task<PagedList<T>> GetPage(GridRequest request, Expression<Func<T, bool>>? filter = null);
     }
 }
