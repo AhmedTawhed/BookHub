@@ -6,6 +6,7 @@ namespace BookHub.Core.Interfaces.Service
     {
         Task<IEnumerable<ReviewResponseDto>> GetReviewsByUser(string userId);
         Task<IEnumerable<ReviewResponseDto>> GetReviewsByBook(int bookId);
+        Task<ReviewResponseDto> GetReviewById(int reviewId);
         Task<ReviewResponseDto> AddReview(ReviewRequestDto dto);
         Task<ReviewResponseDto> UpdateReview(string userId, int reviewId, ReviewRequestDto dto);
     }

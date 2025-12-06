@@ -24,7 +24,8 @@ namespace BookHub.Infrastructure.Repositories
         public async Task Add(T entity) => await _dbSet.AddAsync(entity);
         public void Update(T entity) => _dbSet.Update(entity);
         public void Delete(T entity) => _dbSet.Remove(entity);
-        ///////
+        public async Task<IEnumerable<T>> Find(Expression<Func<T, bool>> predicate) =>
+        await _dbSet.Where(predicate).ToListAsync();
         public async Task<PagedList<T>> GetPage(GridRequest request, Expression<Func<T, bool>>? filter = null)
         {
             var query = _dbSet.AsQueryable();
@@ -48,7 +49,7 @@ namespace BookHub.Infrastructure.Repositories
                     query = query.Where(searchQuery, text);
                 }
             }
-            // Sorting
+
             var validColumns = typeof(T).GetProperties().Select(p => p.Name).ToList();
 
             if (!string.IsNullOrEmpty(request.SortColumn) &&
@@ -57,13 +58,12 @@ namespace BookHub.Infrastructure.Repositories
                 var direction = request.SortDirection?.ToLower() == "desc" ? "desc" : "asc";
                 query = query.OrderBy($"{request.SortColumn} {direction}");
             }
-
+           
             var totalCount = await query.CountAsync();
 
-            // Pagination
             var items = await query
-                .Skip(request.Skip)
-                .Take(request.Take)
+                .Skip(request.Skip < 0 ? 0 : request.Skip)
+                .Take(request.Take <= 0 ? 10 : Math.Min(request.Take, 100))
                 .ToListAsync();
 
             return new PagedList<T>

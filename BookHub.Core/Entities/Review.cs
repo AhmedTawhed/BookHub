@@ -15,7 +15,7 @@ namespace BookHub.Core.Entities
         public ApplicationUser User { get; set; }
         public int Rating { get; set; } // e.g., 1 to 5
         public string Comment { get; set; } = string.Empty;
-        public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BookHub.Core.DTOs.Auth;
 using BookHub.Core.Entities;
+using BookHub.Core.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -32,11 +33,15 @@ namespace BookHub.Infrastructure.Services.Auth
                 UserName = registerDto.UserName,
                 Email = registerDto.Email
             };
+
             var result = await _userManager.CreateAsync(user, registerDto.Password);
+
             if (!result.Succeeded)
             {
-                throw new Exception($"User registration failed");
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new BadRequestException($"User registration failed: {errors}");
             }
+
             await _userManager.AddToRoleAsync(user, "User");
         }
 
@@ -44,11 +49,11 @@ namespace BookHub.Infrastructure.Services.Auth
         {
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
             if (user == null)
-                throw new Exception("Invalid credentials");
+                throw new UnauthorizedException("Invalid credentials");
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
-            if (!result.Succeeded)
-                throw new Exception("Invalid credentials");
+            var passwordValid = await _signInManager.CheckPasswordSignInAsync(user, loginDto.Password, false);
+            if (!passwordValid.Succeeded)
+                throw new UnauthorizedException("Invalid credentials");
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
 

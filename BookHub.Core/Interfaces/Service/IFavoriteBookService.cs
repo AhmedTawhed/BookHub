@@ -6,6 +6,6 @@ namespace BookHub.Core.Interfaces.Service
     {
         Task<FavoriteBookDto> AddFavoriteBook(string userId, int bookId);
         Task<IEnumerable<FavoriteBookDto>> GetUserFavoriteBooks(string userId);
-        Task<bool> RemoveFavoriteBook(string userId, int bookId);
+        Task RemoveFavoriteBook(string userId, int bookId);
     }
 }

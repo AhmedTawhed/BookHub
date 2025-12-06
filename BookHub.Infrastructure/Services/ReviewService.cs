@@ -1,5 +1,6 @@
 ﻿using BookHub.Core.DTOs.ReviewDtos;
 using BookHub.Core.Entities;
+using BookHub.Core.Exceptions;
 using BookHub.Core.Interfaces;
 using BookHub.Core.Interfaces.Service;
 
@@ -22,7 +23,7 @@ namespace BookHub.Infrastructure.Services
                 UserId = review.UserId,
                 Rating = review.Rating,
                 Comment = review.Comment,
-                CreatedAt = review.CreatedAtUtc
+                CreatedAt = review.CreatedAt
             };
         }
         public async Task<IEnumerable<ReviewResponseDto>> GetReviewsByUser(string userId)
@@ -34,17 +35,21 @@ namespace BookHub.Infrastructure.Services
         public async Task<IEnumerable<ReviewResponseDto>> GetReviewsByBook(int bookId)
         {
             var reviews = await _unitOfWork.Reviews.GetReviewsByBookId(bookId);
-            if (reviews == null)
-                return Enumerable.Empty<ReviewResponseDto>();
-
             return reviews.Select(MapToDto);
 
+        }
+        public async Task<ReviewResponseDto> GetReviewById(int id)
+        {
+            var review = await _unitOfWork.Reviews.GetById(id);
+            if (review == null)
+                throw new NotFoundException("Review not found.");
+            return MapToDto(review);
         }
 
         public async Task<ReviewResponseDto> AddReview(ReviewRequestDto dto)
         {
             if (await _unitOfWork.Reviews.IsReviewed(dto.UserId, dto.BookId))
-                throw new InvalidOperationException("Book has already been reviewed.");
+                throw new BadRequestException("You have already reviewed this book.");
 
             var review = new Review
             {
@@ -52,7 +57,7 @@ namespace BookHub.Infrastructure.Services
                 BookId = dto.BookId,
                 Rating = dto.Rating,
                 Comment = dto.Comment,
-                CreatedAtUtc = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow
             };
 
             await _unitOfWork.Reviews.Add(review);
@@ -67,10 +72,10 @@ namespace BookHub.Infrastructure.Services
             var review = await _unitOfWork.Reviews.GetById(reviewId);
 
             if (review == null)
-                throw new KeyNotFoundException("Review not found.");
+                throw new NotFoundException("Review not found.");
 
             if (review.UserId != userId)
-                throw new UnauthorizedAccessException("You can only update your own reviews.");
+                throw new UnauthorizedException("You can only update your own reviews.");
 
             review.Rating = dto.Rating;
             review.Comment = dto.Comment;

@@ -1,5 +1,6 @@
 ﻿using BookHub.Core.DTOs.CategoryDtos;
 using BookHub.Core.Entities;
+using BookHub.Core.Exceptions;
 using BookHub.Core.Helpers.CustomRequests;
 using BookHub.Core.Helpers.CustomResults;
 using BookHub.Core.Interfaces;
@@ -16,15 +17,19 @@ namespace BookHub.Infrastructure.Services
             _unitOfWork = unitOfWork;
         }
 
+        private CategoryResponseDto MapToDto(Category category)
+        {
+            return new CategoryResponseDto
+            {
+                Id = category.Id,
+                Name = category.Name
+            };
+        }
         public async Task<IEnumerable<CategoryResponseDto>> GetAllCategories()
         {
             var categories = await _unitOfWork.Categories.GetAll();
 
-            return categories.Select(c => new CategoryResponseDto
-            {
-                Id = c.Id,
-                Name = c.Name
-            });
+            return categories.Select(MapToDto);
         }
 
         public async Task<CategoryResponseDto?> GetCategoryById(int id)
@@ -32,17 +37,18 @@ namespace BookHub.Infrastructure.Services
             var category = await _unitOfWork.Categories.GetById(id);
 
             if (category == null)
-                return null;
+                throw new NotFoundException("Category not found");
 
-            return new CategoryResponseDto
-            {
-                Id = category.Id,
-                Name = category.Name
-            };
+            return MapToDto(category);
         }
 
         public async Task<CategoryResponseDto> AddCategory(CategoryRequestDto dto)
         {
+            var existingCategory = (await _unitOfWork.Categories
+                .Find(c => c.Name.ToLower() == dto.Name.ToLower())).FirstOrDefault();
+            if (existingCategory != null)
+                throw new BadRequestException("Category with the same name already exists");
+
             var category = new Category
             {
                 Name = dto.Name
@@ -50,50 +56,41 @@ namespace BookHub.Infrastructure.Services
 
             await _unitOfWork.Categories.Add(category);
             await _unitOfWork.CompleteAsync();
-            return new CategoryResponseDto
-            {
-                Id = category.Id,
-                Name = category.Name
-            };
+
+            return MapToDto(category);
         }
 
-        public async Task<bool> UpdateCategory(int id, CategoryRequestDto dto)
+        public async Task<CategoryResponseDto> UpdateCategory(int id, CategoryRequestDto dto)
         {
             var category = await _unitOfWork.Categories.GetById(id);
 
             if (category == null)
-                return false;
+                throw new NotFoundException("Category not found");
 
             category.Name = dto.Name;
 
             _unitOfWork.Categories.Update(category);
             await _unitOfWork.CompleteAsync();
 
-            return true;
+            return MapToDto(category);
         }
 
-        public async Task<bool> DeleteCategory(int id)
+        public async Task DeleteCategory(int id)
         {
             var category = await _unitOfWork.Categories.GetById(id);
-
             if (category == null)
-                return false;
+                throw new NotFoundException("Category not found");
 
             _unitOfWork.Categories.Delete(category);
             await _unitOfWork.CompleteAsync();
-
-            return true;
         }
 
         public async Task<PagedList<CategoryResponseDto>> GetPagedCategories(GridRequest request)
         {
             var pagedCategories = await _unitOfWork.Categories.GetPage(request);
 
-            var categoryDtos = pagedCategories.Items.Select(c => new CategoryResponseDto
-            { 
-                Id = c.Id,
-                Name = c.Name
-            });
+            var categoryDtos = pagedCategories.Items.Select(MapToDto);
+
             return new PagedList<CategoryResponseDto>
             {
                 Items = categoryDtos,

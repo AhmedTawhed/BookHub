@@ -20,6 +20,7 @@ namespace BookHub.Infrastructure.Repositories
         {
             return await _context.FavoriteBooks
                 .Where(b => b.UserId == userId)
+                .Include(b => b.Book)
                 .ToListAsync();
         }
 

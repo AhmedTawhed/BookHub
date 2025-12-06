@@ -11,6 +11,7 @@ namespace BookHub.Core.Interfaces.Repository
         Task<IEnumerable<T>> GetAll();
         Task<T?> GetById(int id);
         void Update(T entity);
+        Task<IEnumerable<T>> Find(Expression<Func<T, bool>> predicate);
         Task<PagedList<T>> GetPage(GridRequest request, Expression<Func<T, bool>>? filter = null);
     }
 }
