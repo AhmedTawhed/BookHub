@@ -7,10 +7,10 @@ namespace BookHub.Core.Interfaces.Service
     public interface ICategoryService
     {
         Task<CategoryResponseDto> AddCategory(CategoryRequestDto dto);
-        Task<bool> DeleteCategory(int id);
+        Task DeleteCategory(int id);
         Task<IEnumerable<CategoryResponseDto>> GetAllCategories();
         Task<CategoryResponseDto?> GetCategoryById(int id);
-        Task<bool> UpdateCategory(int id, CategoryRequestDto dto);
+        Task<CategoryResponseDto> UpdateCategory(int id, CategoryRequestDto dto);
         Task<PagedList<CategoryResponseDto>> GetPagedCategories(GridRequest request);
     }
 }

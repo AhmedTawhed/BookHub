@@ -1,6 +1,8 @@
 ﻿using BookHub.Core.Entities;
+using BookHub.Infrastructure.Data.Seeding;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace BookHub.Infrastructure.Data
 {
@@ -19,7 +21,6 @@ namespace BookHub.Infrastructure.Data
         {
             base.OnModelCreating(builder);
 
-            // Composite Key for FavoriteBook
             builder.Entity<FavoriteBook>()
                 .HasKey(fb => new { fb.UserId, fb.BookId });
 
@@ -33,7 +34,6 @@ namespace BookHub.Infrastructure.Data
                 .WithMany(b => b.FavoriteUsers)
                 .HasForeignKey(fb => fb.BookId);
 
-            // Review relationships
             builder.Entity<Review>()
                 .HasOne(r => r.User)
                 .WithMany()
@@ -45,6 +45,10 @@ namespace BookHub.Infrastructure.Data
                 .WithMany(b => b.Reviews)
                 .HasForeignKey(r => r.BookId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            DataSeed.Seed(builder);
+
         }
+        
     }
 }

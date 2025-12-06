@@ -1,7 +1,11 @@
 ﻿using BookHub.Core.DTOs.BookDtos;
 using BookHub.Core.Helpers.CustomRequests;
+using BookHub.Core.Helpers.CustomResults;
 using BookHub.Core.Interfaces.Service;
+using BookHub.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace BookHub.Controllers
 {
@@ -16,66 +20,53 @@ namespace BookHub.Controllers
             _bookService = bookService;
         }
 
-        [HttpGet]
+        [AllowAnonymous]
+        [HttpGet("all")]
         public async Task<IActionResult> GetAllBooks()
         {
             var books = await _bookService.GetAllBooks();
-            return Ok(books);
+            return Ok(ApiResponse<IEnumerable<BookResponseDto>>.Ok(books, "Books retrieved successfully"));
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBookById(int id)
         {
             var book = await _bookService.GetBookById(id);
-
-            if (book == null)
-                return NotFound();
-
-            return Ok(book);
+            return Ok(ApiResponse<BookResponseDto>.Ok(book, "Book retrieved successfully"));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Addbook([FromBody] BookRequestDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
             var createdBook = await _bookService.AddBook(dto);
-
-            return CreatedAtAction(nameof(GetBookById), new { id = createdBook.Id }, createdBook);
+            return CreatedAtAction(nameof(GetBookById), new { id = createdBook.Id },
+                ApiResponse<BookResponseDto>.Ok(createdBook, "Book created successfully"));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBook(int id, [FromBody] BookRequestDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-            
             var updatedBook = await _bookService.UpdateBook(id, dto);
-
-            if (updatedBook == null)
-                return NotFound();
-
-            return NoContent();
+            return Ok(ApiResponse<BookResponseDto>.Ok(updatedBook, "Book updated successfully"));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id)
         {
-            var deleted = await _bookService.DeleteBook(id);
-
-            if (!deleted)
-                return NotFound();
-
-            return NoContent();
+            await _bookService.DeleteBook(id);
+            return Ok(ApiResponse<string>.Ok(null, "Book deleted successfully"));
         }
 
-        [HttpGet]
+        [AllowAnonymous]
+        [HttpGet("paged")]
         public async Task<IActionResult> GetPagedBooks([FromQuery] GridRequest request)
         {
             var result = await _bookService.GetPagedBooks(request);
-
-            return Ok(result);
+            return Ok(ApiResponse<PagedList<BookResponseDto>>.Ok(result, "Paged books retrieved successfully"));
         }
     }
 }

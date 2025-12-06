@@ -1,5 +1,6 @@
 ﻿using BookHub.Core.DTOs.Auth;
 using BookHub.Infrastructure.Services.Auth;
+using BookHub.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookHub.Controllers
@@ -18,35 +19,15 @@ namespace BookHub.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            try
-            {
-                await _authService.Register(dto);
-                return Ok(new { Message = "User registered successfully" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
+            await _authService.Register(dto);
+            return Ok(ApiResponse<string>.Ok(null, "User registered successfully"));
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            try
-            {
-                var response = await _authService.Login(dto);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return Unauthorized(new { Error = ex.Message });
-            }
+            var authResponse = await _authService.Login(dto);
+            return Ok(ApiResponse<AuthResponseDto>.Ok(authResponse, "Login successful"));
         }
     }
 }
