@@ -1,13 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36623.8 d17.14
+VisualStudioVersion = 17.14.36623.8
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookHub", "BookHub\BookHub.csproj", "{B904C179-673D-443C-99EF-336C1A88F9F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookHub.API", "BookHub\BookHub.API.csproj", "{B904C179-673D-443C-99EF-336C1A88F9F1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookHub.Core", "BookHub.Core\BookHub.Core.csproj", "{276F4BC5-9BE7-402D-A42B-754906227B26}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookHub.Infrastructure", "BookHub.Infrastructure\BookHub.Infrastructure.csproj", "{3E45BA3F-F467-42D5-A59D-CAD5783625DE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		Solution Items\BookHub API.postman_collection.json = Solution Items\BookHub API.postman_collection.json
+		Solution Items\README.md = Solution Items\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,6 +1,6 @@
 ﻿using BookHub.Core.DTOs.Auth;
 
-namespace BookHub.Infrastructure.Services.Auth
+namespace BookHub.Core.Interfaces.Service
 {
     public interface IAuthService
     {

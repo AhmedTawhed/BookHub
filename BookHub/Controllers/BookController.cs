@@ -2,12 +2,11 @@
 using BookHub.Core.Helpers.CustomRequests;
 using BookHub.Core.Helpers.CustomResults;
 using BookHub.Core.Interfaces.Service;
-using BookHub.Responses;
+using BookHub.Core.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
-namespace BookHub.Controllers
+namespace BookHub.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

@@ -1,9 +1,9 @@
 ﻿using BookHub.Core.Exceptions;
-using BookHub.Responses;
+using BookHub.Core.Responses;
 using System.Net;
 using System.Text.Json;
 
-namespace BookHub.Middlewares
+namespace BookHub.API.Middlewares
 {
     public class GlobalExceptionMiddleware
     {

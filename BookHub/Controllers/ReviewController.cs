@@ -1,12 +1,12 @@
 ﻿using BookHub.Core.DTOs.ReviewDtos;
 using BookHub.Core.Exceptions;
 using BookHub.Core.Interfaces.Service;
-using BookHub.Responses;
+using BookHub.Core.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace BookHub.Controllers
+namespace BookHub.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

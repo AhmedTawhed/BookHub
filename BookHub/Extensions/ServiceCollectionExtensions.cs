@@ -4,7 +4,7 @@ using BookHub.Infrastructure.Repositories;
 using BookHub.Infrastructure.Services;
 using BookHub.Infrastructure.Services.Auth;
 
-namespace BookHub.Extensions
+namespace BookHub.API.Extensions
 {
     public static class ServiceCollectionExtensions
     {

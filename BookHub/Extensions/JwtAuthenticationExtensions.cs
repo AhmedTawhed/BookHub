@@ -1,10 +1,10 @@
-﻿using BookHub.Responses;
+﻿using BookHub.Core.Responses;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
 
-namespace BookHub.Extensions
+namespace BookHub.API.Extensions
 {
     public static class JwtAuthenticationExtensions
     {

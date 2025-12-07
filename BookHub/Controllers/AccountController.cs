@@ -1,9 +1,9 @@
 ﻿using BookHub.Core.DTOs.Auth;
-using BookHub.Infrastructure.Services.Auth;
-using BookHub.Responses;
+using BookHub.Core.Interfaces.Service;
+using BookHub.Core.Responses;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BookHub.Controllers
+namespace BookHub.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

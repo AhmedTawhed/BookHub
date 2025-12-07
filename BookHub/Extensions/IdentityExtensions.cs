@@ -2,7 +2,7 @@
 using BookHub.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 
-namespace BookHub.Extensions
+namespace BookHub.API.Extensions
 {
     public static class IdentityExtensions
     {

@@ -1,6 +1,7 @@
 ﻿using BookHub.Core.DTOs.Auth;
 using BookHub.Core.Entities;
 using BookHub.Core.Exceptions;
+using BookHub.Core.Interfaces.Service;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;

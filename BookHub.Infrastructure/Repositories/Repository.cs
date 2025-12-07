@@ -58,19 +58,22 @@ namespace BookHub.Infrastructure.Repositories
                 var direction = request.SortDirection?.ToLower() == "desc" ? "desc" : "asc";
                 query = query.OrderBy($"{request.SortColumn} {direction}");
             }
-           
+
+            int skip = request.Skip < 0 ? 0 : request.Skip;
+            int take = request.Take <= 0 ? 10 : Math.Min(request.Take, 100);
+
             var totalCount = await query.CountAsync();
 
             var items = await query
-                .Skip(request.Skip < 0 ? 0 : request.Skip)
-                .Take(request.Take <= 0 ? 10 : Math.Min(request.Take, 100))
+                .Skip(skip)
+                .Take(take)
                 .ToListAsync();
 
             return new PagedList<T>
             {
                 Items = items,
                 TotalCount = totalCount,
-                NumberOfPages = (int)Math.Ceiling((double)totalCount / request.Take)
+                NumberOfPages = (int)Math.Ceiling((double)totalCount / take)
             };
         }
     }

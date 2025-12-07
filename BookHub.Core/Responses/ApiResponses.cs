@@ -1,4 +1,4 @@
-﻿namespace BookHub.Responses
+﻿namespace BookHub.Core.Responses
 {
     public class ApiResponse<T>
     {
