@@ -1,41 +1,59 @@
-📚 BookHub API
+﻿# 📚 BookHub API
 
-BookHub is a clean and scalable **ASP.NET Core 9 Web API** for managing books, categories, user favorites, and reviews.  
-It includes authentication, authorization, admin features, and a set of RESTful endpoints built using **EF Core**, **SQL Server**, **Identity**, and **JWT Authentication**.  
+BookHub is a clean and scalable **ASP.NET Core 9 Web API** for managing books, categories, user favorites, and reviews. It is architected using Clean Architecture principles and implements the Repository & Unit-of-Work patterns to ensure maintainability and testability.
 
-This project is designed as a **portfolio piece** to demonstrate practical backend skills.
+This project serves as a **portfolio piece** to demonstrate modern backend development skills, focusing on security, database design, and containerization.
 
 ---
 
 ## ✨ Key Features
 
 ### 🔒 Authentication & Authorization
-- Register and login with **JWT**
-- **ASP.NET Core Identity** integration
-- Pre-seeded roles: **Admin & User**
-- Role-based authorization on endpoints
+- **Identity Integration:** Built using ASP.NET Core Identity for secure user management.
+- **JWT Support:** Secure token-based authentication for all RESTful endpoints.
+- **Role-Based Access (RBAC):** Distinct permissions for Admin and User roles.
 
-### 📦 Core Modules
-- **Books** (Admin: Add, Edit, Delete)
-- **Categories** (Admin: Add, Edit, Delete)
-- **Favorite Books** (Users: Add, Edit, Delete)
-- **Reviews** (Users: Add, Edit)
-- Global exception handling
-- Validation using **DataAnnotations**
-- **Clean Architecture Principles** (implementing Repository & Unit-of-Work pattern)
+### 📦 Core Modules & Logic
+- **Books & Categories:** Full CRUD operations (Restricted to Admin).
+- **User Engagement:** Users can manage their Favorite Books and write Reviews.
+- **Clean Engineering:** Implementation of Repository & Unit-of-Work patterns.
+- **Robustness:** Global Exception Handling and strict Data Annotations validation.
 
 ### 🔍 Query Features
-- Pagination
-- Sorting
-- Filtering
+- **Pagination:** Efficient data fetching for large book collections.
+- **Sorting & Filtering:** Dynamic query capabilities for better user experience.
 
 ---
 
 ## 🗂 Tech Stack
-- **Backend:** ASP.NET Core 9, C#
-- **Database:** SQL Server, EF Core
-- **Authentication:** Identity + JWT
-- **Testing:** Postman Collection included
+### 🛠 Core Technologies
+- **Framework:** ASP.NET Core 9 (Web API)
+- **ORM:** Entity Framework Core
+- **Database:** Microsoft SQL Server
+- **Containerization:** Docker (Multi-stage builds)
+
+### 🏗 Architecture & Patterns
+- **Clean Architecture:** Separation of Concerns (Api, Core, Infrastructure)
+- **Design Patterns:** Repository Pattern & Unit of Work
+- **Security:** ASP.NET Core Identity + JWT Authentication
+
+### 🧪 Tools & Testing
+- **API Documentation:** Swagger / OpenAPI
+- **Manual Testing:** Postman (Collection included in Solution Items/)
+
+---
+
+## 🐳 Run with Docker
+This project is containerized using a multi-stage build for optimal performance.
+### 1. Build the image:
+``` bash
+docker build -t bookhub-api .
+```
+### 2. Run the container:
+``` bash
+docker run -d -p 8080:8080 --name bookhub-container bookhub-api
+```
+(Note: Ensure your connection string in appsettings.json is updated to reach your SQL Server instance from the container).
 
 ---
 
@@ -57,20 +75,15 @@ dotnet run
 Solution Items/BookHub API.postman_collection.json
 
 ---
+
 ## 🗄️ Database & Users
 
-### Automatic Data Seeding:
-- Books & Categories → seeded inside OnModelCreating
-- Roles (Admin, User) → seeded via IdentitySeed.Seed() at startup
+### To simplify testing for recruiters and developers, the system handles roles dynamically:
 
-### Default Admin
-- Email: admin@bookhub.com
-- Password: Admin@123!
-  <br>
-All seeding is handled automatically. No SQL scripts needed.
-### Normal User:
-- Register: POST /api/account/register
-- Login: POST /api/account/login → auto-assigned User role
+- **Pre-seeded Data:** Roles, Categories and sample Books are seeded automatically via OnModelCreating.
+- **Smart Admin Assignment:** The First User who registers via /api/account/register is automatically granted the Admin role.
+	- All subsequent registrations are assigned the User role.
+- **Goal:** This logic allows you to test Admin-only features immediately after your first registration without manual DB edits.
 
 ---
 

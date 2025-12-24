@@ -1,7 +1,6 @@
 using BookHub.Api.Extensions;
 using BookHub.Api.Middlewares;
 using BookHub.Infrastructure.Data;
-using BookHub.Infrastructure.Data.Seeding;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
