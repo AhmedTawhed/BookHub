@@ -1,6 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
 
-namespace BookHub.API.Extensions
+namespace BookHub.Api.Extensions
 {
     public static class SwaggerExtensions
     {

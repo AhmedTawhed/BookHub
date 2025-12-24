@@ -43,7 +43,10 @@ namespace BookHub.Infrastructure.Services.Auth
                 throw new BadRequestException($"User registration failed: {errors}");
             }
 
-            await _userManager.AddToRoleAsync(user, "User");
+            var isFirstUser = !_userManager.Users.Any(u => u.Id != user.Id);
+            var roleToAssign = isFirstUser ? "Admin" : "User";
+
+            await _userManager.AddToRoleAsync(user, roleToAssign);
         }
 
         public async Task<AuthResponseDto> Login(LoginDto loginDto)

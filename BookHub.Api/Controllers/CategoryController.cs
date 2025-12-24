@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BookHub.API.Controllers
+namespace BookHub.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

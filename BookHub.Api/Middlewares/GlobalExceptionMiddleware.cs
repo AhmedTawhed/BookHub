@@ -3,7 +3,7 @@ using BookHub.Core.Responses;
 using System.Net;
 using System.Text.Json;
 
-namespace BookHub.API.Middlewares
+namespace BookHub.Api.Middlewares
 {
     public class GlobalExceptionMiddleware
     {

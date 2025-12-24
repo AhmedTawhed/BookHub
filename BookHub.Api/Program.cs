@@ -1,5 +1,5 @@
-using BookHub.API.Extensions;
-using BookHub.API.Middlewares;
+using BookHub.Api.Extensions;
+using BookHub.Api.Middlewares;
 using BookHub.Infrastructure.Data;
 using BookHub.Infrastructure.Data.Seeding;
 using Microsoft.EntityFrameworkCore;
@@ -21,18 +21,10 @@ builder.Services.AddOpenApiDocumentation();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
-
-using (var scope = app.Services.CreateScope())
-{
-    await IdentitySeed.Seed(scope.ServiceProvider);
-}
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

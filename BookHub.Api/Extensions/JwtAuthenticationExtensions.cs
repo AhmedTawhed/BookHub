@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json;
 
-namespace BookHub.API.Extensions
+namespace BookHub.Api.Extensions
 {
     public static class JwtAuthenticationExtensions
     {
