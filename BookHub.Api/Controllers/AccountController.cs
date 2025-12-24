@@ -3,7 +3,7 @@ using BookHub.Core.Interfaces.Service;
 using BookHub.Core.Responses;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BookHub.API.Controllers
+namespace BookHub.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

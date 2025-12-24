@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookHub.Infrastructure.Migrations
 {
     [DbContext(typeof(BookHubDbContext))]
-    [Migration("20251128214949_InitialCreate")]
+    [Migration("20251224200355_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -105,7 +105,7 @@ namespace BookHub.Infrastructure.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedAtUtc")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -121,6 +121,98 @@ namespace BookHub.Infrastructure.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Books");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Author = "F. Scott Fitzgerald",
+                            CategoryId = 1,
+                            CreatedAt = new DateTime(2025, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A classic novel of the Jazz Age exploring themes of wealth and society.",
+                            Title = "The Great Gatsby"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Author = "George Orwell",
+                            CategoryId = 1,
+                            CreatedAt = new DateTime(2025, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Dystopian novel about surveillance, totalitarianism, and loss of freedom.",
+                            Title = "1984"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Author = "Stephen Hawking",
+                            CategoryId = 2,
+                            CreatedAt = new DateTime(2025, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Stephen Hawking's thoughts on the universe, science, and humanity's future.",
+                            Title = "Brief Answers to the Big Questions"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Author = "Bill Bryson",
+                            CategoryId = 2,
+                            CreatedAt = new DateTime(2025, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A journey through science and history explaining how we understand the world.",
+                            Title = "A Short History of Nearly Everything"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Author = "J.K. Rowling",
+                            CategoryId = 3,
+                            CreatedAt = new DateTime(2025, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "The first adventure of Harry Potter in the magical world of Hogwarts.",
+                            Title = "Harry Potter and the Sorcerer's Stone"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Author = "J.R.R. Tolkien",
+                            CategoryId = 3,
+                            CreatedAt = new DateTime(2025, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Bilbo Baggins embarks on an epic quest with dwarves to reclaim their homeland.",
+                            Title = "The Hobbit"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Author = "Stieg Larsson",
+                            CategoryId = 4,
+                            CreatedAt = new DateTime(2025, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A thriller involving mystery, corporate corruption, and a hacker detective.",
+                            Title = "The Girl with the Dragon Tattoo"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Author = "Gillian Flynn",
+                            CategoryId = 4,
+                            CreatedAt = new DateTime(2025, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A suspenseful story of a marriage gone terribly wrong with shocking twists.",
+                            Title = "Gone Girl"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Author = "Robert C. Martin",
+                            CategoryId = 7,
+                            CreatedAt = new DateTime(2025, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Guidelines and principles for writing maintainable and readable software code.",
+                            Title = "Clean Code"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Author = "James Clear",
+                            CategoryId = 8,
+                            CreatedAt = new DateTime(2025, 12, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A practical guide on building good habits and breaking bad ones.",
+                            Title = "Atomic Habits"
+                        });
                 });
 
             modelBuilder.Entity("BookHub.Core.Entities.Category", b =>
@@ -138,6 +230,48 @@ namespace BookHub.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Fiction"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Science"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Fantasy"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "Thriller"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "Romance"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "History"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "Technology"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "Self-Help"
+                        });
                 });
 
             modelBuilder.Entity("BookHub.Core.Entities.FavoriteBook", b =>
@@ -170,7 +304,7 @@ namespace BookHub.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAtUtc")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Rating")
@@ -214,6 +348,20 @@ namespace BookHub.Infrastructure.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "d290f1ee-6c54-4b01-90e6-d701748f0851",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "f2a6c3a9-0e3b-4f85-8fa1-1b6f1a4b2c7d",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

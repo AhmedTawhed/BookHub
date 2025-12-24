@@ -1,4 +1,5 @@
 ﻿using BookHub.Core.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookHub.Infrastructure.Data.Seeding
@@ -32,6 +33,11 @@ namespace BookHub.Infrastructure.Data.Seeding
                 new Book { Id = 9, Title = "Clean Code", Author = "Robert C. Martin", CategoryId = 7, CreatedAt = fixedDate, Description = "Guidelines and principles for writing maintainable and readable software code." },
                 new Book { Id = 10, Title = "Atomic Habits", Author = "James Clear", CategoryId = 8, CreatedAt = fixedDate, Description = "A practical guide on building good habits and breaking bad ones." }
             );
+
+            builder.Entity<IdentityRole>().HasData(
+               new IdentityRole { Id = "d290f1ee-6c54-4b01-90e6-d701748f0851", Name = "Admin", NormalizedName = "ADMIN" },
+               new IdentityRole { Id = "f2a6c3a9-0e3b-4f85-8fa1-1b6f1a4b2c7d", Name = "User", NormalizedName = "USER" }
+           );
         }
     }
 }

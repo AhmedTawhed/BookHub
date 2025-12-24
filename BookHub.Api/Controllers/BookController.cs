@@ -6,7 +6,7 @@ using BookHub.Core.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BookHub.API.Controllers
+namespace BookHub.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
