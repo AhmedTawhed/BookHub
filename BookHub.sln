@@ -16,6 +16,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Dockerfile = Dockerfile
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookHub.Tests", "BookHub.Tests\BookHub.Tests.csproj", "{67211B54-CFD4-4FC2-BF1A-A864C8F24FD2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{1C05C298-8F53-451D-B67A-CE3F5433D268}"
+	ProjectSection(SolutionItems) = preProject
+		ci.yml = ci.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,9 +43,16 @@ Global
 		{3E45BA3F-F467-42D5-A59D-CAD5783625DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E45BA3F-F467-42D5-A59D-CAD5783625DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E45BA3F-F467-42D5-A59D-CAD5783625DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67211B54-CFD4-4FC2-BF1A-A864C8F24FD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67211B54-CFD4-4FC2-BF1A-A864C8F24FD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67211B54-CFD4-4FC2-BF1A-A864C8F24FD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67211B54-CFD4-4FC2-BF1A-A864C8F24FD2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1C05C298-8F53-451D-B67A-CE3F5433D268} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {99F43C16-E4E2-4892-AE6F-41AB5D70100A}
