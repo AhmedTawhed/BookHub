@@ -7,10 +7,10 @@ namespace BookHub.Infrastructure.Repositories
     public class UnitOfWork : IUnitOfWork
     {
         private readonly BookHubDbContext _context;
-        IBookRepository _bookRepository;
-        ICategoryRepository _categoryRepository;
-        IReviewRepository _reviewRepository;
-        IFavoriteBookRepository _favoriteBookRepository;
+        IBookRepository _bookRepository = default!;
+        ICategoryRepository _categoryRepository = default!;
+        IReviewRepository _reviewRepository = default!;
+        IFavoriteBookRepository _favoriteBookRepository = default!;
 
         public UnitOfWork(BookHubDbContext context)
         {
