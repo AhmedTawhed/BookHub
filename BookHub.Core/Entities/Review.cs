@@ -10,11 +10,11 @@ namespace BookHub.Core.Entities
     {
         public int Id { get; set; }
         public int BookId { get; set; }
-        public Book Book { get; set; }
-        public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
+        public Book Book { get; set; } = default!;
+        public string UserId { get; set; } = default!;
+        public ApplicationUser User { get; set; } = default!;
         public int Rating { get; set; }
-        public string Comment { get; set; } = string.Empty;
+        public string? Comment { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     }

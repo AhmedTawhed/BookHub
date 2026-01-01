@@ -1,11 +1,11 @@
-name: BookHub CI
+name: BookHub CD
 
 on:
-  pull_request:
+  push:
     branches: [ "master" ]
 
 jobs:
-  build-and-test:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,11 +20,15 @@ jobs:
     - name: Restore Dependencies
       run: dotnet restore
 
-    - name: Build Code
+    - name: Build
       run: dotnet build --no-restore --configuration Release
 
-    - name: Run Unit Tests
-      run: dotnet test --no-build --configuration Release --verbosity normal
+    - name: Publish
+      run: dotnet publish -c Release -o ./publish
 
-    - name: Docker Build Check
-      run: docker build . -f Dockerfile -t bookhub-api:latest
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: 'bookhub-api'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: ./publish

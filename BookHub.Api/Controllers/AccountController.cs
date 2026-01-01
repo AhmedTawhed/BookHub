@@ -20,7 +20,7 @@ namespace BookHub.Api.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
             await _authService.Register(dto);
-            return Ok(ApiResponse<string>.Ok(null, "User registered successfully"));
+            return Ok(ApiResponse<string?>.Ok(message : "User registered successfully"));
         }
 
         [HttpPost("login")]

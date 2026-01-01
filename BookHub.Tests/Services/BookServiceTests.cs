@@ -136,7 +136,6 @@ namespace BookHub.Tests.Services
         [Fact]
         public async Task AddBook_CategoryDoesNotExist_ThrowsNotFoundException()
         {
-            var bookId = 1;
             var dto = new BookRequestDto
             {
                 Title = "New Book",
