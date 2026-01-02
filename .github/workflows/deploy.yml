@@ -23,8 +23,8 @@ jobs:
     - name: Build
       run: dotnet build --no-restore --configuration Release
 
-    - name: Publish
-      run: dotnet publish -c Release -o ./publish
+    - name: Publish API
+      run: dotnet publish ./BookHub.Api/BookHub.Api.csproj -c Release -o ./publish
 
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3
