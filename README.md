@@ -1,14 +1,15 @@
 ﻿# 📚 BookHub API
 
+![CI/CD Status](https://github.com/AhmedTawhed/BookHub/actions/workflows/deploy.yml/badge.svg)
 ![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core%209-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
 ![Azure](https://img.shields.io/badge/Azure%20App%20Service-0089D6?style=for-the-badge&logo=microsoftazure&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-Live-success?style=for-the-badge)
 
-**BookHub** is a clean and scalable **ASP.NET Core 9 Web API** for managing books, categories, user favorites, and reviews. It is architected using **Clean Architecture** principles and implements the **Repository & Unit-of-Work** patterns to ensure maintainability and testability.
+**BookHub** is a clean and scalable **ASP.NET Core 9 Web API** for managing books, categories, user favorites, and reviews. Built with **Clean Architecture** and **Cloud-Agnostic** principles, ensuring seamless deployment across **Azure**, **AWS**, or **Docker-based** environments.
 
-This project serves as a **portfolio piece** to demonstrate modern backend development skills, focusing on security, database design, and containerization.
+This project serves as a **portfolio piece** to demonstrate modern backend development skills, focusing on security, database design, and automated CI/CD pipelines.
 
 ---
 
@@ -16,7 +17,7 @@ This project serves as a **portfolio piece** to demonstrate modern backend devel
 - ✅ **Clean Architecture + Repository/Unit-of-Work** → maintainable & testable  
 - ✅ **JWT Auth & Role-Based Access (Admin/User)** → production-grade security  
 - ✅ **CI/CD Pipeline with GitHub Actions** → automated build, test & deploy  
-- ✅ **Azure Deployment + Docker containerization** → cloud-ready & portable  
+- ✅ **Azure Deployment + Docker containerization** → Architected for Azure App Service & Container Registry.
 - ✅ **Full-featured API** → CRUD, Favorites, Reviews, Pagination, Sorting, Filtering  
 - ✅ **xUnit + Moq testing** → business logic validated in isolation  
 - ✅ **Demo Ready** → pre-seeded data & instant Swagger access  
@@ -24,8 +25,8 @@ This project serves as a **portfolio piece** to demonstrate modern backend devel
 ---
 
 ## 🚀 Live Demo
-The API is fully deployed and production-ready:
-- **Swagger UI:** [https://bookhub-api.azurewebsites.net/swagger/index.html](https://bookhub-api.azurewebsites.net/swagger/index.html)
+The API is containerized and currently hosted on **Render** for the live demonstration:
+- **Swagger UI:** [https://bookhub-9x8b.onrender.com/swagger/index.html](https://bookhub-9x8b.onrender.com/swagger/index.html)
 - **API Status:** ✅ Operational
 
 ---
@@ -33,15 +34,15 @@ The API is fully deployed and production-ready:
 ## 🏗 Architecture & Tech Stack
 
 ### 🏗 Architecture
-- **Clean Architecture:** Strict separation of concerns across Api, Core, and Infrastructure layers
-- **Design Patterns:** Repository Pattern & Unit of Work for a clean and decoupled data access layer
+- **Clean Architecture:** Strict separation of concerns across Api, Core, and Infrastructure layers.
+- **Design Patterns:** Repository Pattern & Unit of Work for a clean and decoupled data access layer.
 
 ### 🛠 Tech Stack
 - **Framework:** ASP.NET Core 9 (Web API)  
 - **ORM:** Entity Framework Core  
-- **Database:** Microsoft SQL Server  
+- **Database:** Microsoft SQL Server (Hosted on MonsterASP)  
 - **Testing:** xUnit, Moq, FluentAssertions  
-- **Cloud & DevOps:** Azure App Service, GitHub Actions, Docker
+- **Cloud & DevOps:** Azure App Service (Target), Render (Live Demo), GitHub Actions, Docker.
 
 ---
 
@@ -62,17 +63,17 @@ The API is fully deployed and production-ready:
 
 ## 🧪 Testing Strategy
 To ensure code reliability, the project includes a dedicated testing suite:
-- **Unit Testing:** Focused on validating business logic within the service layer
-- **Featured Tests:** Comprehensive test cases for Book Service, ensuring correct handling of book operations
-- **Isolation:** Dependencies are mocked using Moq to ensure services are tested in isolation
+- **Unit Testing:** Focused on validating business logic within the service layer.
+- **Featured Tests:** Comprehensive test cases for Book Service, ensuring correct handling of book operations.
+- **Isolation:** Dependencies are mocked using Moq to ensure services are tested in isolation.
 
 ---
 
 ## ☁️ DevOps & Deployment
 This project demonstrates a full modern development lifecycle:
-- **CI/CD:** Fully automated via GitHub Actions.
-- **Cloud Hosting:** Deployed on Azure App Service (Linux).
-- **Containerization:** Docker multi-stage build for optimal performance.
+- **CI/CD:** Fully automated via GitHub Actions. On every push to `master`, the pipeline runs tests and triggers deployment.
+- **Cloud Strategy:** Originally designed for **Microsoft Azure**; currently utilizing **Render** for live demo hosting to showcase manual environment configuration and external DB connectivity.
+- **Containerization:** **Docker** multi-stage build. This ensures the app is portable and can be deployed to **Azure Web Apps for Containers** or **Azure Kubernetes Service (AKS)** with zero code changes.
 
 ---
 
@@ -124,9 +125,3 @@ dotnet run
 
 - A complete collection is available in: `Solution Items/BookHub API.postman_collection.json`
 - Includes authentication, admin/user endpoints, pagination, sorting, and filtering examples.
-
----
-
-## 🤝 Contributing
-- Pull requests are welcome.
-- Open an issue for suggestions or improvements.
