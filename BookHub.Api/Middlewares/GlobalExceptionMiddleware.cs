@@ -24,7 +24,9 @@ namespace BookHub.Api.Middlewares
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception occurred.");
+                _logger.LogError(ex, "An unhandled exception occurred while processing {Method} {Path}",
+                    context.Request.Method, context.Request.Path);
+
                 await HandleException(context, ex);
             }
         }

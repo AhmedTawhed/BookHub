@@ -14,6 +14,7 @@ namespace BookHub.Api.Extensions
                 options.Password.RequiredLength = 6;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = true;
+                options.User.RequireUniqueEmail = true;
             })
             .AddEntityFrameworkStores<BookHubDbContext>()
             .AddDefaultTokenProviders();

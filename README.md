@@ -20,6 +20,7 @@ This project serves as a **portfolio piece** to demonstrate modern backend devel
 - ✅ **Azure Deployment + Docker containerization** → Architected for Azure App Service & Container Registry.
 - ✅ **Full-featured API** → CRUD, Favorites, Reviews, Pagination, Sorting, Filtering  
 - ✅ **xUnit + Moq testing** → business logic validated in isolation  
+- ✅ **Structured Logging & Observability** → Integrated Serilog for production-grade monitoring and file-based auditing.
 - ✅ **Demo Ready** → pre-seeded data & instant Swagger access  
 
 ---
@@ -41,8 +42,9 @@ The API is containerized and currently hosted on **Render** for the live demonst
 - **Framework:** ASP.NET Core 9 (Web API)  
 - **ORM:** Entity Framework Core  
 - **Database:** Microsoft SQL Server (Hosted on MonsterASP)  
-- **Testing:** xUnit, Moq, FluentAssertions  
-- **Cloud & DevOps:** Azure App Service (Target), Render (Live Demo), GitHub Actions, Docker.
+- **Testing:** xUnit, Moq, FluentAssertions
+- **Cloud & DevOps:** Azure App Service (Target), Render (Live Demo), GitHub Actions, Docker
+- **Logging: Serilog** (Console, File sinks) with Structured Logging
 
 ---
 
@@ -58,6 +60,12 @@ The API is containerized and currently hosted on **Render** for the live demonst
 - **User Engagement:** Personal Favorites & Reviews management.
 - **Data Handling:** Efficient Pagination, Sorting, and Filtering.
 - **Resilience:** Global exception handling and strict data annotations.
+
+### 🛡️ Resilience & Monitoring
+- **Global Exception Handling:** Centralized middleware that catches all unhandled exceptions, ensuring a consistent `ApiResponse<T>` format and preventing sensitive data leaks.
+- **Structured Logging with Serilog:** High-performance logging to both **Console** and **Rolling Files**, providing full visibility into the system's behavior.
+- **Request Monitoring:** Automatic logging of HTTP request details (Path, Method, Response Time, Status Code) for performance auditing.
+- **Security Auditing:** Detailed logging for critical actions (Login successes/failures, Administrative changes) to ensure traceability.
 
 ---
 
