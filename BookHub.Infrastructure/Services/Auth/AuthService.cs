@@ -1,4 +1,4 @@
-﻿using BookHub.Core.DTOs.Auth;
+using BookHub.Core.DTOs.Auth;
 using BookHub.Core.Entities;
 using BookHub.Core.Exceptions;
 using BookHub.Core.Interfaces.Service;
@@ -74,18 +74,15 @@ namespace BookHub.Infrastructure.Services.Auth
 
             var claims = new List<Claim>
             {
-                new (JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+                new (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new (ClaimTypes.NameIdentifier, user.Id),
                 new (ClaimTypes.Name, user.UserName!),
                 new (ClaimTypes.Email, user.Email!)
             };
 
             var roles = await _userManager.GetRolesAsync(user);
-
             foreach (var role in roles)
-            {
                 claims.Add(new Claim(ClaimTypes.Role, role));
-            }
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -104,6 +101,59 @@ namespace BookHub.Infrastructure.Services.Auth
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
                 Email = user.Email!,
                 UserName = user.UserName!
+            };
+        }
+
+        public async Task<UserProfileDto> GetProfile(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                throw new NotFoundException("User not found.");
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return new UserProfileDto
+            {
+                UserName = user.UserName!,
+                Email = user.Email!,
+                Role = roles.FirstOrDefault() ?? string.Empty
+            };
+        }
+
+        public async Task<UserProfileDto> UpdateProfile(string userId, UpdateProfileDto dto)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                throw new NotFoundException("User not found.");
+
+            if (user.UserName != dto.UserName)
+            {
+                var result = await _userManager.SetUserNameAsync(user, dto.UserName);
+                if (!result.Succeeded)
+                    throw new BadRequestException(string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+
+            if (user.Email != dto.Email)
+            {
+                var result = await _userManager.SetEmailAsync(user, dto.Email);
+                if (!result.Succeeded)
+                    throw new BadRequestException(string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+
+            if (dto.NewPassword != null)
+            {
+                var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword!, dto.NewPassword);
+                if (!result.Succeeded)
+                    throw new BadRequestException(string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            return new UserProfileDto
+            {
+                UserName = user.UserName!,
+                Email = user.Email!,
+                Role = roles.FirstOrDefault() ?? string.Empty
             };
         }
     }
