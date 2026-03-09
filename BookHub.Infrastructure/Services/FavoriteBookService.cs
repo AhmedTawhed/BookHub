@@ -45,7 +45,8 @@ namespace BookHub.Infrastructure.Services
             var favorite = new FavoriteBook
             {
                 UserId = userId,
-                BookId = bookId
+                BookId = bookId,
+                Book = book
             };
 
             await _unitOfWork.FavoriteBooks.Add(favorite);

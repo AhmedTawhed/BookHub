@@ -9,5 +9,6 @@ namespace BookHub.Core.Interfaces.Service
         Task<ReviewResponseDto> GetReviewById(int reviewId);
         Task<ReviewResponseDto> AddReview(ReviewRequestDto dto);
         Task<ReviewResponseDto> UpdateReview(string userId, int reviewId, ReviewRequestDto dto);
+        Task DeleteReview(string userId, int reviewId);
     }
 }
