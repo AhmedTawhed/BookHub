@@ -1,7 +1,10 @@
 ﻿using BookHub.Core.DTOs.Auth;
+using BookHub.Core.Exceptions;
 using BookHub.Core.Interfaces.Service;
 using BookHub.Core.Responses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BookHub.Api.Controllers
 {
@@ -33,5 +36,30 @@ namespace BookHub.Api.Controllers
             var authResponse = await _authService.Login(dto);
             return Ok(ApiResponse<AuthResponseDto>.Ok(authResponse, "Login successful"));
         }
+
+        [Authorize]
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                throw new UnauthorizedException("User is not authenticated.");
+
+            var profile = await _authService.GetProfile(userId);
+            return Ok(ApiResponse<UserProfileDto>.Ok(profile, "Profile retrieved successfully"));
+        }
+
+        [Authorize]
+        [HttpPut("profile")]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto dto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+                throw new UnauthorizedException("User is not authenticated.");
+
+            var updated = await _authService.UpdateProfile(userId, dto);
+            return Ok(ApiResponse<UserProfileDto>.Ok(updated, "Profile updated successfully"));
+        }
+
     }
 }

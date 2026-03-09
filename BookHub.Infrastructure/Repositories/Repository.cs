@@ -10,7 +10,7 @@ namespace BookHub.Infrastructure.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        public readonly BookHubDbContext _context;
+        protected readonly BookHubDbContext _context;
         private readonly DbSet<T> _dbSet;
 
 

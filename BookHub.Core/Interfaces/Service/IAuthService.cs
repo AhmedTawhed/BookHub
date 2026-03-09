@@ -6,5 +6,7 @@ namespace BookHub.Core.Interfaces.Service
     {
         Task<AuthResponseDto> Login(LoginDto loginDto);
         Task Register(RegisterDto registerDto);
+        Task<UserProfileDto> GetProfile(string userId);
+        Task<UserProfileDto> UpdateProfile(string userId, UpdateProfileDto dto);
     }
 }
