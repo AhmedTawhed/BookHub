@@ -15,6 +15,7 @@ builder.Services.AddDbContext<BookHubDbContext>(options =>
 builder.Services.AddBookHubIdentity(builder.Configuration);
 builder.Services.AddBookHubServices();
 builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddMemoryCache();
 builder.Services.AddControllers();
 builder.Services.AddOpenApiDocumentation();
 var allowedOrigins = builder.Configuration
