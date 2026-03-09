@@ -1,8 +1,11 @@
 ﻿using BookHub.Core.Interfaces;
 using BookHub.Core.Interfaces.Service;
+using BookHub.Core.Validators;
 using BookHub.Infrastructure.Repositories;
 using BookHub.Infrastructure.Services;
 using BookHub.Infrastructure.Services.Auth;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 namespace BookHub.Api.Extensions
 {
@@ -17,6 +20,9 @@ namespace BookHub.Api.Extensions
             services.AddScoped<IReviewService, ReviewService>();
             services.AddScoped<IFavoriteBookService, FavoriteBookService>();
             services.AddScoped<IAuthService, AuthService>();
+
+            services.AddFluentValidationAutoValidation();
+            services.AddValidatorsFromAssemblyContaining<BookRequestValidator>();
 
             return services;
         }
