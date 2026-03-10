@@ -37,7 +37,7 @@ namespace BookHub.Api.Controllers
             return Ok(ApiResponse<IEnumerable<ReviewResponseDto>>.Ok(reviews, "Reviews retrieved successfully"));
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetReviewById(int id)
         {
@@ -45,7 +45,7 @@ namespace BookHub.Api.Controllers
             return Ok(ApiResponse<ReviewResponseDto>.Ok(review, "Review retrieved successfully"));
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("book/{bookId}")]
         public async Task<IActionResult> GetReviewsByBook(int bookId)
         {
@@ -74,6 +74,16 @@ namespace BookHub.Api.Controllers
             var updatedReview = await _reviewService.UpdateReview(userId, reviewId, dto);
 
             return Ok(ApiResponse<ReviewResponseDto>.Ok(updatedReview, "Review updated successfully"));
+        }
+
+        [Authorize(Roles = "User")]
+        [HttpDelete("{reviewId}")]
+        public async Task<IActionResult> DeleteReview(int reviewId)
+        {
+            var userId = GetUserId();
+            await _reviewService.DeleteReview(userId, reviewId);
+
+            return Ok(ApiResponse<string>.Ok(null, "Review deleted successfully"));
         }
     }
 }

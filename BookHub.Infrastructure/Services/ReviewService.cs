@@ -85,5 +85,19 @@ namespace BookHub.Infrastructure.Services
 
             return MapToDto(review);
         }
+
+        public async Task DeleteReview(string userId, int reviewId)
+        {
+            var review = await _unitOfWork.Reviews.GetById(reviewId);
+
+            if (review == null)
+                throw new NotFoundException("Review not found.");
+
+            if (review.UserId != userId)
+                throw new UnauthorizedException("You can only delete your own reviews.");
+
+            _unitOfWork.Reviews.Delete(review);
+            await _unitOfWork.CompleteAsync();
+        }
     }
 }
