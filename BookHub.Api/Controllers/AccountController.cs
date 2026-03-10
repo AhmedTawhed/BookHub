@@ -4,6 +4,7 @@ using BookHub.Core.Interfaces.Service;
 using BookHub.Core.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
 namespace BookHub.Api.Controllers
@@ -22,6 +23,7 @@ namespace BookHub.Api.Controllers
         }
 
         [HttpPost("register")]
+        [EnableRateLimiting("auth")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
             _logger.LogInformation("Received registration request for: {Email}", dto.Email);
@@ -30,6 +32,7 @@ namespace BookHub.Api.Controllers
         }
 
         [HttpPost("login")]
+        [EnableRateLimiting("auth")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
             _logger.LogInformation("Received login request for: {Email}", dto.Email);
