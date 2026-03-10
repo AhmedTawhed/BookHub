@@ -16,6 +16,7 @@ builder.Services.AddDbContext<BookHubDbContext>(options =>
 builder.Services.AddBookHubIdentity(builder.Configuration);
 builder.Services.AddBookHubServices();
 builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddMemoryCache();
 builder.Services.AddBookHubRateLimiting();
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<BookHubDbContext>();

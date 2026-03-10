@@ -5,16 +5,20 @@ using BookHub.Core.Helpers.CustomRequests;
 using BookHub.Core.Helpers.CustomResults;
 using BookHub.Core.Interfaces;
 using BookHub.Core.Interfaces.Service;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace BookHub.Infrastructure.Services
 {
     public class CategoryService : ICategoryService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMemoryCache _cache;
+        private const string CategoriesCacheKey = "categories_all";
 
-        public CategoryService(IUnitOfWork unitOfWork)
+        public CategoryService(IUnitOfWork unitOfWork, IMemoryCache cache)
         {
             _unitOfWork = unitOfWork;
+            _cache = cache;
         }
 
         private CategoryResponseDto MapToDto(Category category)
@@ -27,9 +31,14 @@ namespace BookHub.Infrastructure.Services
         }
         public async Task<IEnumerable<CategoryResponseDto>> GetAllCategories()
         {
-            var categories = await _unitOfWork.Categories.GetAll();
+            if (_cache.TryGetValue(CategoriesCacheKey, out IEnumerable<CategoryResponseDto>? cached) && cached != null)
+                return cached;
 
-            return categories.Select(MapToDto);
+            var categories = await _unitOfWork.Categories.GetAll();
+            var result = categories.Select(MapToDto).ToList();
+
+            _cache.Set(CategoriesCacheKey, result, TimeSpan.FromMinutes(10));
+            return result;
         }
 
         public async Task<CategoryResponseDto?> GetCategoryById(int id)
@@ -56,6 +65,7 @@ namespace BookHub.Infrastructure.Services
 
             await _unitOfWork.Categories.Add(category);
             await _unitOfWork.CompleteAsync();
+            _cache.Remove(CategoriesCacheKey);
 
             return MapToDto(category);
         }
@@ -71,6 +81,7 @@ namespace BookHub.Infrastructure.Services
 
             _unitOfWork.Categories.Update(category);
             await _unitOfWork.CompleteAsync();
+            _cache.Remove(CategoriesCacheKey);
 
             return MapToDto(category);
         }
@@ -83,6 +94,7 @@ namespace BookHub.Infrastructure.Services
 
             _unitOfWork.Categories.Delete(category);
             await _unitOfWork.CompleteAsync();
+            _cache.Remove(CategoriesCacheKey);
         }
 
         public async Task<PagedList<CategoryResponseDto>> GetPagedCategories(GridRequest request)
