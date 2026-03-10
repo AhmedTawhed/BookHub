@@ -3,6 +3,7 @@ using BookHub.Api.Middlewares;
 using BookHub.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,16 +16,20 @@ builder.Services.AddDbContext<BookHubDbContext>(options =>
 builder.Services.AddBookHubIdentity(builder.Configuration);
 builder.Services.AddBookHubServices();
 builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddMemoryCache();
+builder.Services.AddBookHubRateLimiting();
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<BookHubDbContext>();
 builder.Services.AddControllers();
 builder.Services.AddOpenApiDocumentation();
 var allowedOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
-    .Get<string[]>();
+    .Get<string[]>() ?? [];
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("BookHubPolicy", policy =>
     {
-        policy.WithOrigins(allowedOrigins!)
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -43,7 +48,17 @@ app.UseHttpsRedirection();
 app.UseCors("BookHubPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapControllers();
+app.MapHealthChecks("/health", new()
+{
+    ResultStatusCodes =
+    {
+        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+        [HealthStatus.Degraded] = StatusCodes.Status200OK,
+        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+    }
+});
 
 app.Run();

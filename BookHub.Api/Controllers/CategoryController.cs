@@ -1,12 +1,9 @@
-﻿using BookHub.Core.DTOs.BookDtos;
-using BookHub.Core.DTOs.CategoryDtos;
-using BookHub.Core.Entities;
+﻿using BookHub.Core.DTOs.CategoryDtos;
 using BookHub.Core.Helpers.CustomRequests;
 using BookHub.Core.Helpers.CustomResults;
 using BookHub.Core.Interfaces.Service;
 using BookHub.Core.Responses;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookHub.Api.Controllers

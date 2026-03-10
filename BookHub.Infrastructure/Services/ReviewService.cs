@@ -1,19 +1,24 @@
-﻿using BookHub.Core.DTOs.ReviewDtos;
+using BookHub.Core.DTOs.ReviewDtos;
 using BookHub.Core.Entities;
 using BookHub.Core.Exceptions;
 using BookHub.Core.Interfaces;
 using BookHub.Core.Interfaces.Service;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace BookHub.Infrastructure.Services
 {
     public class ReviewService : IReviewService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMemoryCache _cache;
+        private const string BooksCacheKey = "books_all";
 
-        public ReviewService(IUnitOfWork unitOfWork)
+        public ReviewService(IUnitOfWork unitOfWork, IMemoryCache cache)
         {
             _unitOfWork = unitOfWork;
+            _cache = cache;
         }
+
         private ReviewResponseDto MapToDto(Review review)
         {
             return new ReviewResponseDto
@@ -26,18 +31,19 @@ namespace BookHub.Infrastructure.Services
                 CreatedAt = review.CreatedAt
             };
         }
+
         public async Task<IEnumerable<ReviewResponseDto>> GetReviewsByUser(string userId)
         {
             var reviews = await _unitOfWork.Reviews.GetReviewsByUserId(userId);
             return reviews.Select(MapToDto);
-
         }
+
         public async Task<IEnumerable<ReviewResponseDto>> GetReviewsByBook(int bookId)
         {
             var reviews = await _unitOfWork.Reviews.GetReviewsByBookId(bookId);
             return reviews.Select(MapToDto);
-
         }
+
         public async Task<ReviewResponseDto> GetReviewById(int id)
         {
             var review = await _unitOfWork.Reviews.GetById(id);
@@ -62,9 +68,9 @@ namespace BookHub.Infrastructure.Services
 
             await _unitOfWork.Reviews.Add(review);
             await _unitOfWork.CompleteAsync();
+            _cache.Remove(BooksCacheKey);
 
             return MapToDto(review);
-
         }
 
         public async Task<ReviewResponseDto> UpdateReview(string userId, int reviewId, ReviewRequestDto dto)
@@ -82,8 +88,24 @@ namespace BookHub.Infrastructure.Services
 
             _unitOfWork.Reviews.Update(review);
             await _unitOfWork.CompleteAsync();
+            _cache.Remove(BooksCacheKey);
 
             return MapToDto(review);
+        }
+
+        public async Task DeleteReview(string userId, int reviewId)
+        {
+            var review = await _unitOfWork.Reviews.GetById(reviewId);
+
+            if (review == null)
+                throw new NotFoundException("Review not found.");
+
+            if (review.UserId != userId)
+                throw new UnauthorizedException("You can only delete your own reviews.");
+
+            _unitOfWork.Reviews.Delete(review);
+            await _unitOfWork.CompleteAsync();
+            _cache.Remove(BooksCacheKey);
         }
     }
 }
