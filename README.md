@@ -1,11 +1,12 @@
 ﻿# 📚 BookHub API
 
-![CI/CD Status](https://github.com/AhmedTawhed/BookHub/actions/workflows/deploy.yml/badge.svg)
 ![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core%209-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
 ![Azure](https://img.shields.io/badge/Azure%20App%20Service-0089D6?style=for-the-badge&logo=microsoftazure&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-Live-success?style=for-the-badge)
+![CI/CD Status](https://github.com/AhmedTawhed/BookHub/actions/workflows/deploy.yml/badge.svg)
+
 
 **BookHub** is a clean and scalable **ASP.NET Core 9 Web API** for managing books, categories, user favorites, and reviews. Built with **Clean Architecture** and **Cloud-Agnostic** principles, ensuring seamless deployment across **Azure**, **AWS**, or **Docker-based** environments.
 
@@ -13,14 +14,18 @@ This project serves as a **portfolio piece** to demonstrate modern backend devel
 
 ---
 
-## ⚡ TL;DR (Why It’s Impressive)
+## ⚡ TL;DR (Why It's Impressive)
 - ✅ **Clean Architecture + Repository/Unit-of-Work** → maintainable & testable  
 - ✅ **JWT Auth & Role-Based Access (Admin/User)** → production-grade security  
 - ✅ **CI/CD Pipeline with GitHub Actions** → automated build, test & deploy  
-- ✅ **Azure Deployment + Docker containerization** → Architected for Azure App Service & Container Registry.
+- ✅ **Azure Deployment + Docker containerization** → Architected for Azure App Service & Container Registry  
 - ✅ **Full-featured API** → CRUD, Favorites, Reviews, Pagination, Sorting, Filtering  
-- ✅ **xUnit + Moq testing** → business logic validated in isolation  
-- ✅ **Structured Logging & Observability** → Integrated Serilog for production-grade monitoring and file-based auditing.
+- ✅ **In-Memory Caching** → cache-aside pattern for books and categories  
+- ✅ **Rate Limiting** → fixed window limiting on auth and general endpoints  
+- ✅ **FluentValidation** → request validation on all DTOs  
+- ✅ **Health Checks** → database connectivity monitoring at `/health`  
+- ✅ **46 Unit Tests** → full service layer coverage with xUnit & Moq  
+- ✅ **Structured Logging & Observability** → Serilog for production-grade monitoring  
 - ✅ **Demo Ready** → pre-seeded data & instant Swagger access  
 
 ---
@@ -42,9 +47,11 @@ The API is containerized and currently hosted on **Render** for the live demonst
 - **Framework:** ASP.NET Core 9 (Web API)  
 - **ORM:** Entity Framework Core  
 - **Database:** Microsoft SQL Server (Hosted on MonsterASP)  
-- **Testing:** xUnit, Moq, FluentAssertions
-- **Cloud & DevOps:** Azure App Service (Target), Render (Live Demo), GitHub Actions, Docker
-- **Logging: Serilog** (Console, File sinks) with Structured Logging
+- **Validation:** FluentValidation  
+- **Caching:** IMemoryCache (cache-aside pattern)  
+- **Testing:** xUnit, Moq, FluentAssertions  
+- **Cloud & DevOps:** Azure App Service (Target), Render (Live Demo), GitHub Actions, Docker  
+- **Logging:** Serilog (Console, File sinks) with Structured Logging  
 
 ---
 
@@ -53,27 +60,80 @@ The API is containerized and currently hosted on **Render** for the live demonst
 ### 🔒 Security
 - **JWT Authentication:** Secure token-based access with ASP.NET Core Identity.
 - **Role-Based Access (RBAC):** Strict permissions (Admin vs User).
-- **Validation:** Secure password management and robust data validation.
+- **Rate Limiting:** Fixed window rate limiting — 5 requests/min on auth endpoints, 60 requests/min on general endpoints.
+- **FluentValidation:** Server-side validation on all incoming DTOs.
 
 ### 📦 Core Modules & Logic
-- **Admin Controls:** Full CRUD for Books & Categories.
+- **Admin Controls:** Full CRUD for Books & Categories (Admin only).
 - **User Engagement:** Personal Favorites & Reviews management.
+- **User Profile:** Get and update profile — username, email, and password.
 - **Data Handling:** Efficient Pagination, Sorting, and Filtering.
-- **Resilience:** Global exception handling and strict data annotations.
+- **Caching:** Cache-aside pattern with IMemoryCache — books and categories cached for 10 minutes, invalidated on write.
+- **Resilience:** Global exception handling and strict data validation.
 
 ### 🛡️ Resilience & Monitoring
-- **Global Exception Handling:** Centralized middleware that catches all unhandled exceptions, ensuring a consistent `ApiResponse<T>` format and preventing sensitive data leaks.
-- **Structured Logging with Serilog:** High-performance logging to both **Console** and **Rolling Files**, providing full visibility into the system's behavior.
+- **Global Exception Handling:** Centralized middleware that catches all unhandled exceptions, ensuring a consistent ApiResponse<T> format and preventing sensitive data leaks.
+- **Health Checks:** Database connectivity exposed at `/health`.
+- **Structured Logging with Serilog:** High-performance logging to both Console and Rolling Files, providing full visibility into the system's behavior.
 - **Request Monitoring:** Automatic logging of HTTP request details (Path, Method, Response Time, Status Code) for performance auditing.
 - **Security Auditing:** Detailed logging for critical actions (Login successes/failures, Administrative changes) to ensure traceability.
 
 ---
 
+## 📮 API Endpoints
+
+### 🔑 Auth — `/api/account`
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| POST | `/register` | Public | Register a new user |
+| POST | `/login` | Public | Login and receive JWT token |
+| GET | `/profile` | Authorized | Get current user profile |
+| PUT | `/profile` | Authorized | Update username, email, or password |
+
+### 📚 Books — `/api/book`
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| GET | `/all` | Public | Get all books with ratings |
+| GET | `/paged` | Public | Get books with pagination, sorting, filtering |
+| GET | `/{id}` | Public | Get book by ID |
+| POST | `/` | Admin | Add a new book |
+| PUT | `/{id}` | Admin | Update a book |
+| DELETE | `/{id}` | Admin | Delete a book |
+
+### 🗂 Categories — `/api/category`
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| GET | `/all` | Public | Get all categories |
+| GET | `/paged` | Public | Get categories with pagination |
+| GET | `/{id}` | Public | Get category by ID |
+| POST | `/` | Admin | Add a new category |
+| PUT | `/{id}` | Admin | Update a category |
+| DELETE | `/{id}` | Admin | Delete a category |
+
+### ⭐ Reviews — `/api/review`
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| GET | `/book/{bookId}` | Public | Get all reviews for a book |
+| GET | `/{id}` | Public | Get review by ID |
+| GET | `/user` | User | Get current user's reviews |
+| POST | `/` | User | Add a review |
+| PUT | `/{reviewId}` | User | Update own review |
+| DELETE | `/{reviewId}` | User | Delete own review |
+
+### ❤️ Favorites — `/api/favoritebook`
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| GET | `/` | User | Get current user's favorite books |
+| POST | `/{bookId}` | User | Add book to favorites |
+| DELETE | `/{bookId}` | User | Remove book from favorites |
+
+---
+
 ## 🧪 Testing Strategy
-To ensure code reliability, the project includes a dedicated testing suite:
-- **Unit Testing:** Focused on validating business logic within the service layer.
-- **Featured Tests:** Comprehensive test cases for Book Service, ensuring correct handling of book operations.
-- **Isolation:** Dependencies are mocked using Moq to ensure services are tested in isolation.
+- **46 Unit Tests** covering the full service layer.
+- **Services covered:** BookService, CategoryService, ReviewService, FavoriteBookService.
+- **Isolation:** All dependencies mocked with Moq.
+- **Assertions:** FluentAssertions for readable test output.
 
 ---
 
@@ -81,7 +141,7 @@ To ensure code reliability, the project includes a dedicated testing suite:
 This project demonstrates a full modern development lifecycle:
 - **CI/CD:** Fully automated via GitHub Actions. On every push to `master`, the pipeline runs tests and triggers deployment.
 - **Cloud Strategy:** Originally designed for **Microsoft Azure**; currently utilizing **Render** for live demo hosting to showcase manual environment configuration and external DB connectivity.
-- **Containerization:** **Docker** multi-stage build. This ensures the app is portable and can be deployed to **Azure Web Apps for Containers** or **Azure Kubernetes Service (AKS)** with zero code changes.
+- **Containerization:** **Docker** multi-stage build. This ensures the app is portable and can be deployed to **Azure Web Apps for Containers**, **Azure Kubernetes Service (AKS)** or any container host with zero code changes.
 
 ---
 
