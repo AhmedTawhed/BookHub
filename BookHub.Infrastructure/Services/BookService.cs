@@ -26,13 +26,18 @@ namespace BookHub.Infrastructure.Services
                 Title = book.Title,
                 Author = book.Author,
                 Description = book.Description,
-                CategoryId = book.CategoryId
+                CategoryId = book.CategoryId,
+                CategoryName = book.Category?.Name ?? string.Empty,
+                ReviewCount = book.Reviews?.Count ?? 0,
+                AverageRating = book.Reviews?.Count > 0
+                    ? Math.Round(book.Reviews.Average(r => r.Rating), 1)
+                    : 0
             };
         }
 
         public async Task<BookResponseDto?> GetBookById(int id)
         {
-            var book = await _unitOfWork.Books.GetById(id);
+            var book = await _unitOfWork.Books.GetByIdWithReviews(id);
             if (book == null)
                 throw new NotFoundException("Book not found");
 
@@ -43,6 +48,9 @@ namespace BookHub.Infrastructure.Services
         {
             var books = await _unitOfWork.Books.GetAll();
             return books.Select(MapToDto);
+            var books = await _unitOfWork.Books.GetBooksWithReviews();
+            var result = books.Select(MapToDto).ToList();
+            return result;
         }
         public async Task<BookResponseDto> AddBook(BookRequestDto dto)
         {
@@ -98,7 +106,7 @@ namespace BookHub.Infrastructure.Services
 
         public async Task<PagedList<BookResponseDto>> GetPagedBooks(GridRequest request)
         {
-            var pagedBooks = await _unitOfWork.Books.GetPage(request);
+            var pagedBooks = await _unitOfWork.Books.GetPagedBooksWithReviews(request);
 
             var bookDtos = pagedBooks.Items.Select(MapToDto);
 
