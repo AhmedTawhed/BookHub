@@ -45,7 +45,7 @@ namespace BookHub.Api.Controllers
             var userId = GetUserId();
             var createdFavorite =  await _favoriteBookService.AddFavoriteBook(userId, bookId);
 
-            return Created(string.Empty, createdFavorite);
+            return Created(string.Empty, ApiResponse<FavoriteBookDto>.Ok(createdFavorite, "Book added to favorites successfully"));
         }
 
         [Authorize(Roles = "User")]

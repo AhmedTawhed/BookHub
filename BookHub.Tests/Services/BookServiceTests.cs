@@ -7,6 +7,7 @@ using BookHub.Core.Interfaces;
 using BookHub.Core.Interfaces.Repository;
 using BookHub.Infrastructure.Services;
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using System.Linq.Expressions;
 
@@ -17,6 +18,7 @@ namespace BookHub.Tests.Services
         private readonly Mock<IUnitOfWork> _mockUoW;
         private readonly Mock<IBookRepository> _mockBooksRepo;
         private readonly Mock<ICategoryRepository> _mockCategoriesRepo;
+        private readonly IMemoryCache _cache;
         private readonly BookService _service;
 
         public BookServiceTests()
@@ -24,11 +26,10 @@ namespace BookHub.Tests.Services
             _mockBooksRepo = new Mock<IBookRepository>();
             _mockCategoriesRepo = new Mock<ICategoryRepository>();
             _mockUoW = new Mock<IUnitOfWork>();
-
             _mockUoW.Setup(u => u.Books).Returns(_mockBooksRepo.Object);
             _mockUoW.Setup(u => u.Categories).Returns(_mockCategoriesRepo.Object);
-
-            _service = new BookService(_mockUoW.Object);
+            _cache = new MemoryCache(new MemoryCacheOptions());
+            _service = new BookService(_mockUoW.Object, _cache);
         }
 
         [Fact]
@@ -41,9 +42,10 @@ namespace BookHub.Tests.Services
                 Title = "Test Book",
                 Author = "Test Author",
                 Description = "Test Description",
-                CategoryId = 1
+                CategoryId = 1,
+                Category = new Category { Id = 1, Name = "Fiction" }
             };
-            _mockBooksRepo.Setup(r => r.GetById(bookId)).ReturnsAsync(book);
+            _mockBooksRepo.Setup(r => r.GetByIdWithReviews(bookId)).ReturnsAsync(book);
 
             var result = await _service.GetBookById(bookId);
 
@@ -53,14 +55,17 @@ namespace BookHub.Tests.Services
             result.Author.Should().Be("Test Author");
             result.Description.Should().Be("Test Description");
             result.CategoryId.Should().Be(1);
+            result.CategoryName.Should().Be("Fiction");
+            result.ReviewCount.Should().Be(0);
+            result.AverageRating.Should().Be(0);
         }
-        [Fact]
 
+        [Fact]
         public async Task GetBookById_BookDoesNotExist_ThrowsNotFoundException()
         {
             var bookId = 1;
-            _mockBooksRepo.Setup(r => r.GetById(bookId)).ReturnsAsync((Book?)null);
-         
+            _mockBooksRepo.Setup(r => r.GetByIdWithReviews(bookId)).ReturnsAsync((Book?)null);
+
             Func<Task> act = async () => await _service.GetBookById(bookId);
 
             await act.Should().ThrowAsync<NotFoundException>()
@@ -72,17 +77,32 @@ namespace BookHub.Tests.Services
         {
             var books = new List<Book>
             {
-                new Book { Id = 1, Title = "Book 1", Author = "Author 1", Description = "Desc 1", CategoryId = 1 },
-                new Book { Id = 2, Title = "Book 2", Author = "Author 2", Description = "Desc 2", CategoryId = 2 }
+                new Book { Id = 1, Title = "Book 1", Author = "Author 1", Description = "Desc 1", CategoryId = 1, Category = new Category { Name = "Cat 1" } },
+                new Book { Id = 2, Title = "Book 2", Author = "Author 2", Description = "Desc 2", CategoryId = 2, Category = new Category { Name = "Cat 2" } }
             };
-            _mockBooksRepo.Setup(r => r.GetAll()).ReturnsAsync(books);
+            _mockBooksRepo.Setup(r => r.GetBooksWithReviews()).ReturnsAsync(books);
 
             var result = await _service.GetAllBooks();
 
             result.Should().HaveCount(2);
             result.First().Title.Should().Be("Book 1");
             result.Last().Title.Should().Be("Book 2");
-            _mockBooksRepo.Verify(b => b.GetAll(), Times.Once);
+            _mockBooksRepo.Verify(b => b.GetBooksWithReviews(), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetAllBooks_SecondCall_ReturnsCachedResult()
+        {
+            var books = new List<Book>
+            {
+                new Book { Id = 1, Title = "Book 1", Author = "Author 1", Category = new Category { Name = "Cat 1" } }
+            };
+            _mockBooksRepo.Setup(r => r.GetBooksWithReviews()).ReturnsAsync(books);
+
+            await _service.GetAllBooks();
+            await _service.GetAllBooks();
+
+            _mockBooksRepo.Verify(b => b.GetBooksWithReviews(), Times.Once);
         }
 
         [Theory]
@@ -270,7 +290,7 @@ namespace BookHub.Tests.Services
                 NumberOfPages = expectedPages
             };
             var gridRequest = new GridRequest { Skip = skip, Take = take };
-            _mockBooksRepo.Setup(b => b.GetPage(It.IsAny<GridRequest>(), null))
+            _mockBooksRepo.Setup(b => b.GetPagedBooksWithReviews(It.IsAny<GridRequest>()))
                           .ReturnsAsync(pagedList);
 
             var result = await _service.GetPagedBooks(gridRequest);
@@ -279,7 +299,7 @@ namespace BookHub.Tests.Services
             result.NumberOfPages.Should().Be(expectedPages);
             result.Items.Should().BeEquivalentTo(items, options => options.ExcludingMissingMembers());
             _mockBooksRepo.Verify(
-                b => b.GetPage(It.Is<GridRequest>(g => g.Skip == skip && g.Take == take), null), Times.Once);
+                b => b.GetPagedBooksWithReviews(It.Is<GridRequest>(g => g.Skip == skip && g.Take == take)), Times.Once);
         }
     }
 }
