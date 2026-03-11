@@ -26,14 +26,21 @@ This project serves as a **portfolio piece** to demonstrate modern backend devel
 - ✅ **Health Checks** → database connectivity monitoring at `/health`  
 - ✅ **46 Unit Tests** → full service layer coverage with xUnit & Moq  
 - ✅ **Structured Logging & Observability** → Serilog for production-grade monitoring  
-- ✅ **Demo Ready** → pre-seeded data & instant Swagger access  
+- ✅ **Demo Ready** → pre-seeded data & instant Swagger access
+- ✅ **Full-Stack Project** → [Angular 21 frontend](https://github.com/AhmedTawhed/BookHub-UI) with [Live Demo](https://cosmic-daffodil-7b3d0b.netlify.app) (signals, standalone components, lazy loading)
 
 ---
 
 ## 🚀 Live Demo
-The API is containerized and currently hosted on **Render** for the live demonstration:
-- **Swagger UI:** [https://bookhub-9x8b.onrender.com/swagger/index.html](https://bookhub-9x8b.onrender.com/swagger/index.html)
-- **API Status:** ✅ Operational
+The API is containerized and currently hosted on **Render** with a fully functional Angular 21 frontend:
+
+| | Link |
+|---|---|
+| 🌐 **Frontend** | [cosmic-daffodil-7b3d0b.netlify.app](https://cosmic-daffodil-7b3d0b.netlify.app) |
+| 📖 **Backend Swagger UI** | [bookhub-9x8b.onrender.com/swagger](https://bookhub-9x8b.onrender.com/swagger/index.html) |
+| 💻 **Frontend Repo** | [github.com/AhmedTawhed/BookHub-UI](https://github.com/AhmedTawhed/BookHub-UI) |
+
+> ⚠️ Render free tier spins down after inactivity — first request may take 30–60s.
 
 ---
 
