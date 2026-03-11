@@ -44,21 +44,33 @@ The API is containerized and currently hosted on **Render** with a fully functio
 
 ---
 
-## 🏗 Architecture & Tech Stack
+## 🏗 Architecture
 
-### 🏗 Architecture
+```
+BookHub/
+├── BookHub.Api/             # Controllers, Middleware, Program.cs
+├── BookHub.Core/            # Entities, DTOs, Interfaces, Validators
+├── BookHub.Infrastructure/  # EF Core, Repositories, Unit of Work
+└── BookHub.Tests/           # xUnit unit tests
+```
+
 - **Clean Architecture:** Strict separation of concerns across Api, Core, and Infrastructure layers.
 - **Design Patterns:** Repository Pattern & Unit of Work for a clean and decoupled data access layer.
 
-### 🛠 Tech Stack
-- **Framework:** ASP.NET Core 9 (Web API)  
-- **ORM:** Entity Framework Core  
-- **Database:** Microsoft SQL Server (Hosted on MonsterASP)  
-- **Validation:** FluentValidation  
-- **Caching:** IMemoryCache (cache-aside pattern)  
-- **Testing:** xUnit, Moq, FluentAssertions  
-- **Cloud & DevOps:** Azure App Service (Target), Render (Live Demo), GitHub Actions, Docker  
-- **Logging:** Serilog (Console, File sinks) with Structured Logging  
+---
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | ASP.NET Core 9 (Web API) |
+| ORM | Entity Framework Core |
+| Database | Microsoft SQL Server (MonsterASP) |
+| Validation | FluentValidation |
+| Caching | IMemoryCache (cache-aside pattern) |
+| Testing | xUnit, Moq, FluentAssertions |
+| Cloud & DevOps | Azure App Service, Render, GitHub Actions, Docker |
+| Logging | Serilog (Console + Rolling File sinks) |
 
 ---
 
@@ -147,7 +159,7 @@ The API is containerized and currently hosted on **Render** with a fully functio
 ## ☁️ DevOps & Deployment
 This project demonstrates a full modern development lifecycle:
 - **CI/CD:** Fully automated via GitHub Actions. On every push to `master`, the pipeline runs tests and triggers deployment.
-- **Cloud Strategy:** Originally designed for **Microsoft Azure**; currently utilizing **Render** for live demo hosting to showcase manual environment configuration and external DB connectivity.
+- **Cloud Strategy:** Architected for **Azure App Service** & **Azure Container Registry**; currently deployed on **Render** for live demo hosting.
 - **Containerization:** **Docker** multi-stage build. This ensures the app is portable and can be deployed to **Azure Web Apps for Containers**, **Azure Kubernetes Service (AKS)** or any container host with zero code changes.
 
 ---
