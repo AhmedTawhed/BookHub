@@ -8,16 +8,26 @@ public static class MassTransitExtensions
     {
         services.AddMassTransit(x =>
         {
-            x.UsingRabbitMq((ctx, cfg) =>
-            {
-                cfg.Host(configuration["RabbitMQ:Host"], "/", h =>
-                {
-                    h.Username(configuration["RabbitMQ:Username"]!);
-                    h.Password(configuration["RabbitMQ:Password"]!);
-                });
+            var host = configuration["RabbitMQ:Host"];
+            var useRabbitMq = !string.IsNullOrWhiteSpace(host) && host != "localhost";
 
-                cfg.ConfigureEndpoints(ctx);
-            });
+            if (useRabbitMq)
+            {
+                x.UsingRabbitMq((ctx, cfg) =>
+                {
+                    cfg.Host(host, "/", h =>
+                    {
+                        h.Username(configuration["RabbitMQ:Username"]!);
+                        h.Password(configuration["RabbitMQ:Password"]!);
+                    });
+
+                    cfg.ConfigureEndpoints(ctx);
+                });
+            }
+            else
+            {
+                x.UsingInMemory((ctx, cfg) => cfg.ConfigureEndpoints(ctx));
+            }
         });
 
         return services;
