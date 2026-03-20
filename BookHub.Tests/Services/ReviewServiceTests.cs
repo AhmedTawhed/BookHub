@@ -5,7 +5,9 @@ using BookHub.Core.Interfaces;
 using BookHub.Core.Interfaces.Repository;
 using BookHub.Infrastructure.Services;
 using FluentAssertions;
+using MassTransit;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace BookHub.Tests.Services
@@ -23,7 +25,11 @@ namespace BookHub.Tests.Services
             _mockUoW = new Mock<IUnitOfWork>();
             _mockUoW.Setup(u => u.Reviews).Returns(_mockReviewRepo.Object);
             _cache = new MemoryCache(new MemoryCacheOptions());
-            _service = new ReviewService(_mockUoW.Object, _cache);
+            _service = new ReviewService(
+                _mockUoW.Object,
+                _cache,
+                new Mock<IPublishEndpoint>().Object,
+                new Mock<ILogger<ReviewService>>().Object);
         }
 
         [Fact]

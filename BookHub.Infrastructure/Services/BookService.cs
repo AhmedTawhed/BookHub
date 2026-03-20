@@ -1,3 +1,4 @@
+using BookHub.Contracts;
 using BookHub.Core.DTOs.BookDtos;
 using BookHub.Core.Entities;
 using BookHub.Core.Exceptions;
@@ -5,7 +6,9 @@ using BookHub.Core.Helpers.CustomRequests;
 using BookHub.Core.Helpers.CustomResults;
 using BookHub.Core.Interfaces;
 using BookHub.Core.Interfaces.Service;
+using MassTransit;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
 namespace BookHub.Infrastructure.Services
 {
@@ -13,12 +16,16 @@ namespace BookHub.Infrastructure.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMemoryCache _cache;
+        private readonly IPublishEndpoint _publishEndpoint;
+        private readonly ILogger<BookService> _logger;
         private const string BooksCacheKey = "books_all";
 
-        public BookService(IUnitOfWork unitOfWork, IMemoryCache cache)
+        public BookService(IUnitOfWork unitOfWork, IMemoryCache cache, IPublishEndpoint publishEndpoint, ILogger<BookService> logger)
         {
             _unitOfWork = unitOfWork;
             _cache = cache;
+            _publishEndpoint = publishEndpoint;
+            _logger = logger;
         }
 
         private BookResponseDto MapToDto(Book book)
@@ -81,6 +88,20 @@ namespace BookHub.Infrastructure.Services
             await _unitOfWork.Books.Add(book);
             await _unitOfWork.CompleteAsync();
             _cache.Remove(BooksCacheKey);
+
+            try
+            {
+                await _publishEndpoint.Publish(new BookAddedEvent
+                {
+                    BookId = book.Id,
+                    Title = book.Title,
+                    Author = book.Author
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Could not publish BookAddedEvent: {Message}", ex.Message);
+            }
 
             return MapToDto(book);
         }
