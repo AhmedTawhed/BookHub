@@ -1,9 +1,12 @@
+using BookHub.Contracts;
 using BookHub.Core.DTOs.ReviewDtos;
 using BookHub.Core.Entities;
 using BookHub.Core.Exceptions;
 using BookHub.Core.Interfaces;
 using BookHub.Core.Interfaces.Service;
+using MassTransit;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
 namespace BookHub.Infrastructure.Services
 {
@@ -11,12 +14,16 @@ namespace BookHub.Infrastructure.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMemoryCache _cache;
+        private readonly IPublishEndpoint _publishEndpoint;
+        private readonly ILogger<ReviewService> _logger;
         private const string BooksCacheKey = "books_all";
 
-        public ReviewService(IUnitOfWork unitOfWork, IMemoryCache cache)
+        public ReviewService(IUnitOfWork unitOfWork, IMemoryCache cache, IPublishEndpoint publishEndpoint, ILogger<ReviewService> logger)
         {
             _unitOfWork = unitOfWork;
             _cache = cache;
+            _publishEndpoint = publishEndpoint;
+            _logger = logger;
         }
 
         private ReviewResponseDto MapToDto(Review review)
@@ -69,6 +76,20 @@ namespace BookHub.Infrastructure.Services
             await _unitOfWork.Reviews.Add(review);
             await _unitOfWork.CompleteAsync();
             _cache.Remove(BooksCacheKey);
+
+            try
+            {
+                await _publishEndpoint.Publish(new ReviewAddedEvent
+                {
+                    BookId = review.BookId,
+                    UserId = review.UserId,
+                    Rating = review.Rating
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Could not publish ReviewAddedEvent: {Message}", ex.Message);
+            }
 
             return MapToDto(review);
         }

@@ -4,6 +4,7 @@ WORKDIR /src
 COPY ["BookHub.Api/BookHub.Api.csproj", "BookHub.Api/"]
 COPY ["BookHub.Core/BookHub.Core.csproj", "BookHub.Core/"]
 COPY ["BookHub.Infrastructure/BookHub.Infrastructure.csproj", "BookHub.Infrastructure/"]
+COPY ["BookHub.Contracts/BookHub.Contracts.csproj", "BookHub.Contracts/"]
 
 RUN dotnet restore "BookHub.Api/BookHub.Api.csproj"
 

@@ -1,7 +1,9 @@
+using BookHub.Contracts;
 using BookHub.Core.DTOs.Auth;
 using BookHub.Core.Entities;
 using BookHub.Core.Exceptions;
 using BookHub.Core.Interfaces.Service;
+using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -18,17 +20,20 @@ namespace BookHub.Infrastructure.Services.Auth
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _config;
         private readonly ILogger<AuthService> _logger;
+        private readonly IPublishEndpoint _publishEndpoint;
 
         public AuthService(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IConfiguration config,
-            ILogger<AuthService> logger)
+            ILogger<AuthService> logger,
+            IPublishEndpoint publishEndpoint)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _config = config;
             _logger = logger;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task Register(RegisterDto registerDto)
@@ -48,6 +53,20 @@ namespace BookHub.Infrastructure.Services.Auth
             var isFirstUser = !_userManager.Users.Any(u => u.Id != user.Id);
             var roleToAssign = isFirstUser ? "Admin" : "User";
             await _userManager.AddToRoleAsync(user, roleToAssign);
+
+            try
+            {
+                await _publishEndpoint.Publish(new UserRegisteredEvent
+                {
+                    UserId = user.Id,
+                    UserName = user.UserName!,
+                    Email = user.Email!
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning("Could not publish UserRegisteredEvent: {Message}", ex.Message);
+            }
 
             _logger.LogInformation("User {UserName} registered successfully with role {Role}", user.UserName, roleToAssign);
         }
