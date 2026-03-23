@@ -28,7 +28,7 @@ namespace BookHub.Api.Controllers
         {
             _logger.LogInformation("Received registration request for: {Email}", dto.Email);
             await _authService.Register(dto);
-            return Ok(ApiResponse<string?>.Ok(message : "User registered successfully"));
+            return Ok(ApiResponse<string?>.Ok(message: "User registered successfully"));
         }
 
         [HttpPost("login")]

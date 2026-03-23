@@ -1,4 +1,5 @@
-﻿using BookHub.Core.DTOs.BookDtos;
+﻿using BookHub.Contracts;
+using BookHub.Core.DTOs.BookDtos;
 using BookHub.Core.Entities;
 using BookHub.Core.Exceptions;
 using BookHub.Core.Helpers.CustomRequests;
@@ -7,7 +8,6 @@ using BookHub.Core.Interfaces;
 using BookHub.Core.Interfaces.Repository;
 using BookHub.Infrastructure.Services;
 using FluentAssertions;
-using MassTransit;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -20,6 +20,7 @@ namespace BookHub.Tests.Services
         private readonly Mock<IUnitOfWork> _mockUoW;
         private readonly Mock<IBookRepository> _mockBooksRepo;
         private readonly Mock<ICategoryRepository> _mockCategoriesRepo;
+        private readonly Mock<IEventPublisher> _mockEventPublisher;
         private readonly IMemoryCache _cache;
         private readonly BookService _service;
 
@@ -28,13 +29,14 @@ namespace BookHub.Tests.Services
             _mockBooksRepo = new Mock<IBookRepository>();
             _mockCategoriesRepo = new Mock<ICategoryRepository>();
             _mockUoW = new Mock<IUnitOfWork>();
+            _mockEventPublisher = new Mock<IEventPublisher>();
             _mockUoW.Setup(u => u.Books).Returns(_mockBooksRepo.Object);
             _mockUoW.Setup(u => u.Categories).Returns(_mockCategoriesRepo.Object);
             _cache = new MemoryCache(new MemoryCacheOptions());
             _service = new BookService(
                 _mockUoW.Object,
                 _cache,
-                new Mock<IPublishEndpoint>().Object,
+                _mockEventPublisher.Object,
                 new Mock<ILogger<BookService>>().Object);
         }
 
@@ -138,6 +140,22 @@ namespace BookHub.Tests.Services
             result.CategoryId.Should().Be(categoryId);
             _mockBooksRepo.Verify(r => r.Add(It.Is<Book>(b => b.Title == title)), Times.Once);
             _mockUoW.Verify(u => u.CompleteAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task AddBook_ValidRequest_PublishesBookAddedEvent()
+        {
+            var dto = new BookRequestDto { Title = "Clean Code", Author = "Robert Martin", Description = "A must read", CategoryId = 1 };
+            var category = new Category { Id = 1, Name = "Programming" };
+            _mockCategoriesRepo.Setup(r => r.GetById(1)).ReturnsAsync(category);
+            _mockBooksRepo.Setup(r => r.Find(It.IsAny<Expression<Func<Book, bool>>>()))
+                .ReturnsAsync(new List<Book>());
+
+            await _service.AddBook(dto);
+
+            _mockEventPublisher.Verify(
+                p => p.PublishAsync(It.Is<BookAddedEvent>(e => e.Title == "Clean Code" && e.Author == "Robert Martin")),
+                Times.Once);
         }
 
         [Fact]

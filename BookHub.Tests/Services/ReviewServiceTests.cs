@@ -1,3 +1,4 @@
+using BookHub.Contracts;
 using BookHub.Core.DTOs.ReviewDtos;
 using BookHub.Core.Entities;
 using BookHub.Core.Exceptions;
@@ -5,7 +6,6 @@ using BookHub.Core.Interfaces;
 using BookHub.Core.Interfaces.Repository;
 using BookHub.Infrastructure.Services;
 using FluentAssertions;
-using MassTransit;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -16,6 +16,7 @@ namespace BookHub.Tests.Services
     {
         private readonly Mock<IUnitOfWork> _mockUoW;
         private readonly Mock<IReviewRepository> _mockReviewRepo;
+        private readonly Mock<IEventPublisher> _mockEventPublisher;
         private readonly IMemoryCache _cache;
         private readonly ReviewService _service;
 
@@ -23,12 +24,13 @@ namespace BookHub.Tests.Services
         {
             _mockReviewRepo = new Mock<IReviewRepository>();
             _mockUoW = new Mock<IUnitOfWork>();
+            _mockEventPublisher = new Mock<IEventPublisher>();
             _mockUoW.Setup(u => u.Reviews).Returns(_mockReviewRepo.Object);
             _cache = new MemoryCache(new MemoryCacheOptions());
             _service = new ReviewService(
                 _mockUoW.Object,
                 _cache,
-                new Mock<IPublishEndpoint>().Object,
+                _mockEventPublisher.Object,
                 new Mock<ILogger<ReviewService>>().Object);
         }
 
@@ -108,6 +110,19 @@ namespace BookHub.Tests.Services
             result.Comment.Should().Be(dto.Comment);
             _mockReviewRepo.Verify(r => r.Add(It.Is<Review>(rv => rv.UserId == dto.UserId && rv.BookId == dto.BookId)), Times.Once);
             _mockUoW.Verify(u => u.CompleteAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task AddReview_ValidRequest_PublishesReviewAddedEvent()
+        {
+            var dto = new ReviewRequestDto { UserId = "user-1", BookId = 1, Rating = 5, Comment = "Excellent" };
+            _mockReviewRepo.Setup(r => r.IsReviewed(dto.UserId, dto.BookId)).ReturnsAsync(false);
+
+            await _service.AddReview(dto);
+
+            _mockEventPublisher.Verify(
+                p => p.PublishAsync(It.Is<ReviewAddedEvent>(e => e.BookId == 1 && e.UserId == "user-1" && e.Rating == 5)),
+                Times.Once);
         }
 
         [Fact]
