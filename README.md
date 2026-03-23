@@ -4,13 +4,17 @@
 ![Azure](https://img.shields.io/badge/Azure%20App%20Service-0089D6?style=for-the-badge&logo=microsoftazure&logoColor=white)
 ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-Live-success?style=for-the-badge)
 ![CI/CD Status](https://github.com/AhmedTawhed/BookHub/actions/workflows/deploy.yml/badge.svg)
 
 
-**BookHub** is a clean and scalable **ASP.NET Core 9 Web API** for managing books, categories, user favorites, and reviews. Built with **Clean Architecture** and **Cloud-Agnostic** principles, ensuring seamless deployment across **Azure**, **AWS**, or **Docker-based** environments.
+**BookHub** is a production-ready **ASP.NET Core 9** ecosystem built with **Clean Architecture** and **Cloud-Agnostic** principles. It features a high-performance Web API for book management and a decoupled **NotificationService** communicating asynchronously via **RabbitMQ**.
 
-This project serves as a **portfolio piece** to demonstrate modern backend development skills, focusing on security, database design, and automated CI/CD pipelines.
+Designed for seamless deployment across **Azure**, **AWS**, or **Docker-based** environments, this project demonstrates modern backend engineering for distributed systems. It integrates production-grade concerns: **JWT Auth**, **Role-Based Access (RBAC)**, **In-Memory Caching**, **Rate Limiting**, and **Polyglot Persistence** (SQL Server & PostgreSQL).
+
+This project serves as a **portfolio piece** to showcase real-world backend engineering skills for distributed, cloud-ready systems.
 
 ---
 
@@ -24,7 +28,9 @@ This project serves as a **portfolio piece** to demonstrate modern backend devel
 - ✅ **Rate Limiting** → fixed window limiting on auth and general endpoints  
 - ✅ **FluentValidation** → request validation on all DTOs  
 - ✅ **Health Checks** → database connectivity monitoring at `/health`  
-- ✅ **46 Unit Tests** → full service layer coverage with xUnit & Moq  
+- ✅ **52 Unit Tests** → full service layer coverage with xUnit & Moq
+- ✅ **Event-Driven Microservices** → IEventPublisher abstraction + RabbitMQ + dedicated NotificationService
+- ✅ **Multi-Container Orchestration** → Full environment (API, Worker, SQL, Postgres, RabbitMQ) via Docker Compose  
 - ✅ **Structured Logging & Observability** → Serilog for production-grade monitoring  
 - ✅ **Demo Ready** → pre-seeded data & instant Swagger access
 - ✅ **Full-Stack Project** → [Angular 21 frontend](https://github.com/AhmedTawhed/BookHub-UI) with [Live Demo](https://cosmic-daffodil-7b3d0b.netlify.app) (signals, standalone components, lazy loading)
@@ -48,14 +54,17 @@ The API is containerized and currently hosted on **Render** with a fully functio
 
 ```
 BookHub/
-├── BookHub.Api/             # Controllers, Middleware, Program.cs
-├── BookHub.Core/            # Entities, DTOs, Interfaces, Validators
-├── BookHub.Infrastructure/  # EF Core, Repositories, Unit of Work
-└── BookHub.Tests/           # xUnit unit tests
+├── BookHub.Api/                  # Controllers, Middleware, Program.cs
+├── BookHub.Core/                 # Entities, DTOs, Interfaces, Validators
+├── BookHub.Infrastructure/       # EF Core, Repositories, Unit of Work, Event Publishing
+├── BookHub.Contracts/            # Shared message contracts (events)
+├── BookHub.NotificationService/  # Worker service — consumes events via RabbitMQ
+└── BookHub.Tests/                # xUnit unit tests
 ```
 
 - **Clean Architecture:** Strict separation of concerns across Api, Core, and Infrastructure layers.
 - **Design Patterns:** Repository Pattern & Unit of Work for a clean and decoupled data access layer.
+- **Event-Driven:** The API publishes domain events (e.g. `BookAddedEvent`, `UserRegisteredEvent`) via `IEventPublisher`. The NotificationService consumes these events through RabbitMQ using MassTransit and persists them to PostgreSQL.
 
 ---
 
@@ -65,7 +74,8 @@ BookHub/
 |---|---|
 | Framework | ASP.NET Core 9 (Web API) |
 | ORM | Entity Framework Core |
-| Database | Microsoft SQL Server (MonsterASP) |
+| Database | Microsoft SQL Server · PostgreSQL (NotificationService) |
+| Messaging | MassTransit · RabbitMQ |
 | Validation | FluentValidation |
 | Caching | IMemoryCache (cache-aside pattern) |
 | Testing | xUnit, Moq, FluentAssertions |
@@ -89,6 +99,12 @@ BookHub/
 - **Data Handling:** Efficient Pagination, Sorting, and Filtering.
 - **Caching:** Cache-aside pattern with IMemoryCache — books and categories cached for 10 minutes, invalidated on write.
 - **Resilience:** Global exception handling and strict data validation.
+
+### 🔔 Event-Driven Messaging
+- **Abstraction Layer:** Services depend on `IEventPublisher`, not MassTransit directly — follows Dependency Inversion Principle.
+- **Asynchronous Flow:** API publishes domain events (`BookAddedEvent`, `UserRegisteredEvent`) to RabbitMQ via MassTransit.
+- **Decoupled Consumer:** A dedicated `NotificationService` worker consumes events and persists them to PostgreSQL — zero coupling with the main API.
+- **Fault Tolerance:** Falls back to in-memory transport if RabbitMQ is unavailable, keeping the API fully operational.
 
 ### 🛡️ Resilience & Monitoring
 - **Global Exception Handling:** Centralized middleware that catches all unhandled exceptions, ensuring a consistent ApiResponse<T> format and preventing sensitive data leaks.
@@ -149,8 +165,8 @@ BookHub/
 ---
 
 ## 🧪 Testing Strategy
-- **46 Unit Tests** covering the full service layer.
-- **Services covered:** BookService, CategoryService, ReviewService, FavoriteBookService.
+- **52 Unit Tests** covering the full service layer.
+- **Services covered:** BookService, CategoryService, ReviewService, FavoriteBookService, AuthService.
 - **Isolation:** All dependencies mocked with Moq.
 - **Assertions:** FluentAssertions for readable test output.
 
@@ -179,16 +195,15 @@ This project demonstrates a full modern development lifecycle:
 ---
 
 ## 🐳 Run with Docker
-This project is containerized using a multi-stage build for optimal performance.
-### 1. Build the image:
+The full environment (API, NotificationService, SQL Server, PostgreSQL, RabbitMQ) is orchestrated with Docker Compose.
+
 ``` bash
-docker build -t bookhub-api .
+docker compose up --build
 ```
-### 2. Run the container:
-``` bash
-docker run -d -p 8080:8080 --name bookhub-container bookhub-api
-```
-(Note: Ensure your connection string in appsettings.json is updated to reach your SQL Server instance from the container).
+
+- API available at `http://localhost:8080/swagger`
+- RabbitMQ management UI at `http://localhost:15672` (guest / guest)
+- Health checks ensure services start in the correct order
 
 ---
 
@@ -197,14 +212,11 @@ docker run -d -p 8080:8080 --name bookhub-container bookhub-api
 ``` bash
 git clone https://github.com/AhmedTawhed/BookHub
 ```
-### 2. Apply migrations:
-``` bash
-dotnet ef database update
-```
-### 3. Run the API:
+### 2. Run the API:
 ``` bash
 dotnet run
 ```
+> Migrations are applied automatically on startup — no manual `dotnet ef database update` needed.
 
 ---
 
