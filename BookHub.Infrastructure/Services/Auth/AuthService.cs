@@ -2,8 +2,8 @@ using BookHub.Contracts;
 using BookHub.Core.DTOs.Auth;
 using BookHub.Core.Entities;
 using BookHub.Core.Exceptions;
+using BookHub.Core.Interfaces;
 using BookHub.Core.Interfaces.Service;
-using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -20,20 +20,20 @@ namespace BookHub.Infrastructure.Services.Auth
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IConfiguration _config;
         private readonly ILogger<AuthService> _logger;
-        private readonly IPublishEndpoint _publishEndpoint;
+        private readonly IEventPublisher _eventPublisher;
 
         public AuthService(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IConfiguration config,
             ILogger<AuthService> logger,
-            IPublishEndpoint publishEndpoint)
+            IEventPublisher eventPublisher)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _config = config;
             _logger = logger;
-            _publishEndpoint = publishEndpoint;
+            _eventPublisher = eventPublisher;
         }
 
         public async Task Register(RegisterDto registerDto)
@@ -56,7 +56,7 @@ namespace BookHub.Infrastructure.Services.Auth
 
             try
             {
-                await _publishEndpoint.Publish(new UserRegisteredEvent
+                await _eventPublisher.PublishAsync(new UserRegisteredEvent
                 {
                     UserId = user.Id,
                     UserName = user.UserName!,

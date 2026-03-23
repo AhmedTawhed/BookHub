@@ -1,6 +1,7 @@
 ﻿using BookHub.Core.Interfaces;
 using BookHub.Core.Interfaces.Service;
 using BookHub.Core.Validators;
+using BookHub.Infrastructure.Messaging;
 using BookHub.Infrastructure.Repositories;
 using BookHub.Infrastructure.Services;
 using BookHub.Infrastructure.Services.Auth;
@@ -14,6 +15,7 @@ namespace BookHub.Api.Extensions
         public static IServiceCollection AddBookHubServices(this IServiceCollection services)
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IEventPublisher, MassTransitEventPublisher>();
 
             services.AddScoped<IBookService, BookService>();
             services.AddScoped<ICategoryService, CategoryService>();

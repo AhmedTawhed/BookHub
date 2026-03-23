@@ -6,7 +6,6 @@ using BookHub.Core.Helpers.CustomRequests;
 using BookHub.Core.Helpers.CustomResults;
 using BookHub.Core.Interfaces;
 using BookHub.Core.Interfaces.Service;
-using MassTransit;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
@@ -16,15 +15,15 @@ namespace BookHub.Infrastructure.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMemoryCache _cache;
-        private readonly IPublishEndpoint _publishEndpoint;
+        private readonly IEventPublisher _eventPublisher;
         private readonly ILogger<BookService> _logger;
         private const string BooksCacheKey = "books_all";
 
-        public BookService(IUnitOfWork unitOfWork, IMemoryCache cache, IPublishEndpoint publishEndpoint, ILogger<BookService> logger)
+        public BookService(IUnitOfWork unitOfWork, IMemoryCache cache, IEventPublisher eventPublisher, ILogger<BookService> logger)
         {
             _unitOfWork = unitOfWork;
             _cache = cache;
-            _publishEndpoint = publishEndpoint;
+            _eventPublisher = eventPublisher;
             _logger = logger;
         }
 
@@ -91,7 +90,7 @@ namespace BookHub.Infrastructure.Services
 
             try
             {
-                await _publishEndpoint.Publish(new BookAddedEvent
+                await _eventPublisher.PublishAsync(new BookAddedEvent
                 {
                     BookId = book.Id,
                     Title = book.Title,

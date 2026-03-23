@@ -37,7 +37,7 @@ namespace BookHub.Api.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<IActionResult> Addbook([FromBody] BookRequestDto dto)
+        public async Task<IActionResult> AddBook([FromBody] BookRequestDto dto)
         {
             var createdBook = await _bookService.AddBook(dto);
             return CreatedAtAction(nameof(GetBookById), new { id = createdBook.Id },
